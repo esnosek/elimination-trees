@@ -26,5 +26,5 @@ def draw_mesh(mesh, depth_level):
         for key in mesh.face_list.face_tree:
             face = mesh.face_list.face_tree[key]
             for e in face.edge_list:
-                if face.level < depth_level:
+                if face.level <= depth_level:
                     plt.plot([e.v1.x, e.v2.x], [e.v1.y, e.v2.y], 'k')
