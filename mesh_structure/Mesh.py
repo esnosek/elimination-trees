@@ -18,22 +18,22 @@ class Mesh:
 
     def is_slicable_top(self, v):
         condition = (lambda v1: v1.y < self.max_y)
-        get_max_edge = (lambda v1: v1.get_max_top_edge())
+        get_max_edge = (lambda v1: v1.get_edges_incident().get_max_top_edge())
         return self.__break_on_trough(v, get_max_edge, condition)
 
     def is_slicable_right(self, v):
         condition = (lambda v1: v1.x < self.max_x)
-        get_max_edge = (lambda v1: v1.get_max_right_edge())
+        get_max_edge = (lambda v1: v1.get_edges_incident().get_max_right_edge())
         return self.__break_on_trough(v, get_max_edge, condition)
 
     def is_slicable_bottom(self, v):
         condition = (lambda v1: v1.y > self.min_y)
-        get_max_edge = (lambda v1: v1.get_max_bottom_edge())
+        get_max_edge = (lambda v1: v1.get_edges_incident().get_max_bottom_edge())
         return self.__break_on_trough(v, get_max_edge, condition)
 
     def is_slicable_left(self, v):
         condition = (lambda v1: v1.x > self.min_x)
-        get_max_edge = (lambda v1: v1.get_max_left_edge())
+        get_max_edge = (lambda v1: v1.get_edges_incident().get_max_left_edge())
         return self.__break_on_trough(v, get_max_edge, condition)
 
     def is_slicable_horizontally(self, v):
@@ -63,22 +63,22 @@ class Mesh:
 
     def __get_bottom_slice(self, start_v, end_v):
         condition = (lambda start_v, end_v: start_v.y > end_v.y)
-        get_edge = (lambda v: v.get_max_bottom_edge())
+        get_edge = (lambda v: v.get_edges_incident().get_max_bottom_edge())
         return self.__get_slice2(start_v, end_v, get_edge, condition)
 
     def __get_left_slice(self, start_v, end_v):
         condition = (lambda start_v, end_v: start_v.x > end_v.x)
-        get_edge = (lambda v: v.get_max_left_edge())
+        get_edge = (lambda v: v.get_edges_incident().get_max_left_edge())
         return self.__get_slice2(start_v, end_v, get_edge, condition)
 
     def __get_right_slice(self, start_v, end_v):
         condition = (lambda start_v, end_v: start_v.x < end_v.x)
-        get_edge = (lambda v: v.get_max_right_edge())
+        get_edge = (lambda v: v.get_edges_incident().get_max_right_edge())
         return self.__get_slice(start_v, end_v, get_edge, condition)
 
     def __get_top_slice(self, start_v, end_v):
         condition = (lambda start_v, end_v: start_v.y < end_v.y)
-        get_edge = (lambda v: v.get_max_top_edge())
+        get_edge = (lambda v: v.get_edges_incident().get_max_top_edge())
         return self.__get_slice(start_v, end_v, get_edge, condition)
 
     def __get_slice(self, start_v, end_v, get_edge, condition):

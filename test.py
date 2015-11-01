@@ -4,7 +4,7 @@ import time
 
 # W katalogu mesh_tests znajdują się dwwa pliki do testów:
 # duży_test.txt oraz test1.txt.
-fileName = "mesh_tests/duzy_test.txt"
+fileName = "mesh_tests/test1.txt"
 # fileName = "mesh_tests/duzy_test.txt"
 
 # Testowanie cięcia krawędzi. Ze względu na wersję testową działa tylko dla
