@@ -61,25 +61,25 @@ class Mesh:
             else:
                 return self.__get_left_slice(end_v, start_v)
 
-    def __get_bottom_slice(self, v, end_v):
-        condition = (lambda v, end_v: v.y > end_v.y)
+    def __get_bottom_slice(self, start_v, end_v):
+        condition = (lambda start_v, end_v: start_v.y > end_v.y)
         get_edge = (lambda v: v.get_max_bottom_edge())
-        return self.__get_slice2(v, end_v, get_edge, condition)
+        return self.__get_slice2(start_v, end_v, get_edge, condition)
 
-    def __get_left_slice(self, v, end_v):
-        condition = (lambda v, end_v: v.x > end_v.x)
+    def __get_left_slice(self, start_v, end_v):
+        condition = (lambda start_v, end_v: start_v.x > end_v.x)
         get_edge = (lambda v: v.get_max_left_edge())
-        return self.__get_slice2(v, end_v, get_edge, condition)
+        return self.__get_slice2(start_v, end_v, get_edge, condition)
 
-    def __get_right_slice(self, v, end_v):
-        condition = (lambda v, end_v: v.x < end_v.x)
+    def __get_right_slice(self, start_v, end_v):
+        condition = (lambda start_v, end_v: start_v.x < end_v.x)
         get_edge = (lambda v: v.get_max_right_edge())
-        return self.__get_slice(v, end_v, get_edge, condition)
+        return self.__get_slice(start_v, end_v, get_edge, condition)
 
-    def __get_top_slice(self, v, end_v):
-        condition = (lambda v, end_v: v.y < end_v.y)
+    def __get_top_slice(self, start_v, end_v):
+        condition = (lambda start_v, end_v: start_v.y < end_v.y)
         get_edge = (lambda v: v.get_max_top_edge())
-        return self.__get_slice(v, end_v, get_edge, condition)
+        return self.__get_slice(start_v, end_v, get_edge, condition)
 
     def __get_slice(self, start_v, end_v, get_edge, condition):
         slice_edges = np.empty(dtype=object, shape=0)
@@ -95,18 +95,6 @@ class Mesh:
 
         return slice_edges
 
-    def test(self):
-        mesh_slice = MeshSlice(self.contour)
-        self.slice_edges = np.empty(dtype=object, shape=0)
-        e1 = self.edge_list.get_edge((4, 4, 4, 8))
-        e2 = self.edge_list.get_edge((4, 0, 4, 4))
-        v1 = self.vertex_list.get_vertex((8, 8))
-        v2 = self.vertex_list.get_vertex((8, 0))
-        self.slice_edges = np.append(self.slice_edges, e1)
-        self.slice_edges = np.append(self.slice_edges, e2)
-        self.list1, self.list2 = mesh_slice.slice_mesh(v1, v2, 
-                                                            self.slice_edges)
-
     def __get_slice2(self, start_v, end_v, get_edge, condition):
         slice_edges = np.empty(dtype=object, shape=0)
         edge = get_edge(start_v)
@@ -120,6 +108,18 @@ class Mesh:
                 fl = False
 
         return slice_edges
+
+    def test(self):
+        mesh_slice = MeshSlice(self.contour)
+        self.slice_edges = np.empty(dtype=object, shape=0)
+        e1 = self.edge_list.get_edge((4, 4, 4, 8))
+        e2 = self.edge_list.get_edge((4, 0, 4, 4))
+        v1 = self.vertex_list.get_vertex((8, 8))
+        v2 = self.vertex_list.get_vertex((8, 0))
+        self.slice_edges = np.append(self.slice_edges, e1)
+        self.slice_edges = np.append(self.slice_edges, e2)
+        self.list1, self.list2 = mesh_slice.slice_mesh(v1, v2,
+                                                       self.slice_edges)
 
     def __break_on_trough(self, current_v, get_max_edge, condition):
         while condition(current_v):
@@ -138,11 +138,13 @@ class Mesh:
         v1 = self.vertex_list.get_vertex((0, 0))
         v2 = self.vertex_list.get_vertex((0, self.max_y))
         v3 = self.vertex_list.get_vertex((self.max_x, self.max_y))
-        v4 = self.vertex_list.get_vertex((self.max_x,0))
-        contour_edges_list = np.append(contour_edges_list, self.get_slice_edges(v1,v2))
-        contour_edges_list = np.append(contour_edges_list, self.get_slice_edges(v2,v3))
-        contour_edges_list = np.append(contour_edges_list, self.get_slice_edges(v3,v4))
-        contour_edges_list = np.append(contour_edges_list, self.get_slice_edges(v4,v1))
+        v4 = self.vertex_list.get_vertex((self.max_x, 0))
+        contour_edges_list = np.append(contour_edges_list,
+                                       self.get_slice_edges(v1, v2))
+        contour_edges_list = np.append(contour_edges_list,
+                                       self.get_slice_edges(v2, v3))
+        contour_edges_list = np.append(contour_edges_list,
+                                       self.get_slice_edges(v3, v4))
+        contour_edges_list = np.append(contour_edges_list,
+                                       self.get_slice_edges(v4, v1))
         return contour_edges_list
-        
-        

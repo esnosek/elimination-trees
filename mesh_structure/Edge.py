@@ -10,11 +10,11 @@ class Edge:
         self.v1 = v1
         self.v2 = v2
         self.__set_length()
-        self.face_incident_tree = bt.FastRBTree()
+        self.face_incident = bt.FastRBTree()
 
     def add_incident_face(self, f):
         key = (f.level, f.id)
-        self.face_incident_tree.insert(key, f)
+        self.face_incident.insert(key, f)
 
     def __set_length(self):
         if (self.v1.x == self.v2.x):

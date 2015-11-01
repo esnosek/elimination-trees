@@ -9,7 +9,7 @@ class FaceList:
     def __init__(self):
         self.face_tree = bt.FastRBTree()
 
-    def add_face(self, level, id, vertex_list, edge_list):
+    def create_face(self, level, id, vertex_list, edge_list):
         f = Face(level, id, vertex_list, edge_list)
         key = (level, id)
         if key in self.face_tree:

@@ -2,6 +2,7 @@
 
 import bintrees as bt
 import functools as f
+from mesh_structure.EdgeIncident import EdgeIncident
 
 
 @f.total_ordering
@@ -10,7 +11,7 @@ class Vertex:
     def __init__(self, x, y):
         self.x = x
         self.y = y
-        self.edge_incident_tree = bt.FastRBTree()
+        self.edge_incident = EdgeIncident()
         self.face_incident_tree = bt.FastRBTree()
 
     def add_incident_edge(self, e):
@@ -30,51 +31,35 @@ class Vertex:
             else:
                 key = (3, e.length)
 
-        self.edge_incident_tree.insert(key, e)
+        self.edge_incident.add_incident_edge(key, e)
 
     def get_max_top_edge(self):
-        return self.__get_longest_edge(0)
+        return self.edge_incident.get_max_top_edge()
 
     def get_max_right_edge(self):
-        return self.__get_longest_edge(1)
+        return self.edge_incident.get_max_right_edge()
 
     def get_max_bottom_edge(self):
-        return self.__get_longest_edge(2)
+        return self.edge_incident.get_max_bottom_edge()
 
     def get_max_left_edge(self):
-        return self.__get_longest_edge(3)
+        return self.edge_incident.get_max_left_edge()
 
     def top_edge_exists(self):
-        return self.__edge_exists(0)
+        return self.edge_incident.top_edge_exists()
 
     def right_edge_exists(self):
-        return self.__edge_exists(1)
+        return self.edge_incident.right_edge_exists()
 
     def bottom_edge_exists(self):
-        return self.__edge_exists(2)
+        return self.edge_incident.bottom_edge_exists()
 
     def left_edge_exists(self):
-        return self.__edge_exists(3)
-
-    def __edge_exists(self, direction):
-        tree_slice = bt.FastRBTree(self.edge_incident_tree[(direction, 0):
-                                                           (direction + 1, 0)])
-        if not tree_slice.is_empty():
-            return False
-        else:
-            return True
+        return self.edge_incident.left_edge_exists()
 
     def add_incident_face(self, f):
         key = (f.level, f.id)
         self.face_incident_tree.insert(key, f)
-
-    def __get_longest_edge(self, direction):
-        tree_slice = bt.FastRBTree(self.edge_incident_tree[(direction, 0):
-                                                           (direction + 1, 0)])
-        if not tree_slice.is_empty():
-            return tree_slice[max(tree_slice)]
-        else:
-            raise ValueError
 
     def __str__(self):
         s = ("[" + str(self.x) + ", " + str(self.y) + "]") + "\n"

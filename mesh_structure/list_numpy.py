@@ -30,10 +30,10 @@ def create_mesh_structure(mesh):
     edge_list = EdgeList()
     face_list = FaceList()
     for row in mesh:
-        v1 = vertex_list.add_vertex(row[2], row[3])
-        v2 = vertex_list.add_vertex(row[4], row[5])
-        v3 = vertex_list.add_vertex(row[6], row[7])
-        v4 = vertex_list.add_vertex(row[8], row[9])
+        v1 = vertex_list.create_vertex(row[2], row[3])
+        v2 = vertex_list.create_vertex(row[4], row[5])
+        v3 = vertex_list.create_vertex(row[6], row[7])
+        v4 = vertex_list.create_vertex(row[8], row[9])
         e1 = edge_list.create_edge(v1, v2)  # kolejnosc wazna: v1 < v2
         e2 = edge_list.create_edge(v1, v4)  # kolejnosc wazna: v1 < v4
         e3 = edge_list.create_edge(v2, v3)  # kolejnosc wazna: v2 < v3
@@ -41,6 +41,6 @@ def create_mesh_structure(mesh):
 
         v_list = np.array([v1, v2, v3, v4])
         e_list = np.array([e1, e2, e3, e4])
-        face_list.add_face(row[0], row[1], v_list, e_list)
+        face_list.create_face(row[0], row[1], v_list, e_list)
 
     return Mesh(vertex_list, edge_list, face_list)

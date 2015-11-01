@@ -18,7 +18,7 @@ class VertexList:
             s = s + str(vertex) + "\n"
         return s
 
-    def add_vertex(self, x, y):
+    def create_vertex(self, x, y):
         v = Vertex(x, y)
         key_x = (x, y)
         key_y = (y, x)
