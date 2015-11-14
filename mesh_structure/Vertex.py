@@ -2,7 +2,8 @@
 
 import bintrees as bt
 import functools as f
-from mesh_structure.EdgeIncident import EdgeIncident
+from mesh_structure.EdgeBunch import EdgeBunch
+from mesh_structure.Direction import Direction
 
 
 @f.total_ordering
@@ -11,7 +12,10 @@ class Vertex:
     def __init__(self, x, y):
         self.x = x
         self.y = y
-        self.edges_incident = EdgeIncident()
+        self.top_edges = EdgeBunch(Direction.top)
+        self.right_edges = EdgeBunch(Direction.right)
+        self.bottom_edges = EdgeBunch(Direction.bottom)
+        self.left_edges = EdgeBunch(Direction.left)
         self.face_incident_tree = bt.FastRBTree()
 
     def add_incident_edge(self, e):
@@ -22,23 +26,34 @@ class Vertex:
 
         if self.x == v.x:
             if self.y < v.y:
-                key = (0, e.length)
+                self.__add_top_edge(e)
             else:
-                key = (2, e.length)
+                self.__add_bottom_edge(e)
         else:
             if self.x < v.x:
-                key = (1, e.length)
+                self.__add_right_edge(e)
             else:
-                key = (3, e.length)
+                self.__add_left_edge(e)
 
-        self.edges_incident.add_incident_edge(key, e)
+    def __add_top_edge(self, e):
+        key = (Direction.top, e.length)
+        self.top_edges.add_incident_edge(key, e)
+
+    def __add_right_edge(self, e):
+        key = (Direction.right, e.length)
+        self.right_edges.add_incident_edge(key, e)
+
+    def __add_bottom_edge(self, e):
+        key = (Direction.bottom, e.length)
+        self.bottom_edges.add_incident_edge(key, e)
+
+    def __add_left_edge(self, e):
+        key = (Direction.left, e.length)
+        self.left_edges.add_incident_edge(key, e)
 
     def add_incident_face(self, f):
         key = (f.level, f.id)
         self.face_incident_tree.insert(key, f)
-
-    def get_edges_incident(self):
-        return self.edges_incident
 
     def __str__(self):
         s = ("[" + str(self.x) + ", " + str(self.y) + "]") + "\n"

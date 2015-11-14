@@ -44,3 +44,22 @@ def create_mesh_structure(mesh):
         face_list.create_face(row[0], row[1], v_list, e_list)
 
     return Mesh(vertex_list, edge_list, face_list)
+
+
+    def visit_face(self, face):
+       # print('jestemss jestem')
+        self.visited_list = np.append(self.visited_list, face)
+        for edge in face.edge_list:
+            if (edge not in self.visited_edge) and (edge not in self.contour):
+                self.visited_edge = np.append(self.visited_edge, edge)
+                for f_key in edge.face_incident:
+                    #print(f_key)
+                    next_face = edge.face_incident[f_key]
+                    if (next_face != face) and (next_face not in self.visited_list):
+                        self.visit_face(next_face)
+
+    def depth_first_search(self):
+        first_edge = self.contour[0]
+        first_face = min(first_edge.face_incident)
+        first_face = first_edge.face_incident[first_face]
+        self.visit_face(first_face)

@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
-from mesh_structure.MeshSlice import MeshSlice
 
 
 class Mesh:
@@ -63,22 +62,22 @@ class Mesh:
 
     def __get_bottom_slice(self, start_v, end_v):
         condition = (lambda start_v, end_v: start_v.y > end_v.y)
-        get_edge = (lambda v: v.get_edges_incident().get_max_bottom_edge())
+        get_edge = (lambda v: v.bottom_edges.get_longest_edge())
         return self.__get_slice2(start_v, end_v, get_edge, condition)
 
     def __get_left_slice(self, start_v, end_v):
         condition = (lambda start_v, end_v: start_v.x > end_v.x)
-        get_edge = (lambda v: v.get_edges_incident().get_max_left_edge())
+        get_edge = (lambda v: v.left_edges.get_longest_edge())
         return self.__get_slice2(start_v, end_v, get_edge, condition)
 
     def __get_right_slice(self, start_v, end_v):
         condition = (lambda start_v, end_v: start_v.x < end_v.x)
-        get_edge = (lambda v: v.get_edges_incident().get_max_right_edge())
+        get_edge = (lambda v: v.right_edges.get_longest_edge())
         return self.__get_slice(start_v, end_v, get_edge, condition)
 
     def __get_top_slice(self, start_v, end_v):
         condition = (lambda start_v, end_v: start_v.y < end_v.y)
-        get_edge = (lambda v: v.get_edges_incident().get_max_top_edge())
+        get_edge = (lambda v: v.top_edges.get_longest_edge())
         return self.__get_slice(start_v, end_v, get_edge, condition)
 
     def __get_slice(self, start_v, end_v, get_edge, condition):
@@ -88,7 +87,10 @@ class Mesh:
         fl = True
         while condition(edge.v1, end_v) and fl:
             if condition(edge.v2, end_v):
-                edge = get_edge(edge.v2)
+                try:
+                    edge = get_edge(edge.v2)
+                except ValueError:
+                    continue
                 slice_edges = np.append(slice_edges, edge)
             else:
                 fl = False
@@ -102,24 +104,15 @@ class Mesh:
         fl = True
         while condition(edge.v2, end_v) and fl:
             if condition(edge.v1, end_v):
-                edge = get_edge(edge.v1)
+                try:
+                    edge = get_edge(edge.v1)
+                except ValueError:
+                    continue
                 slice_edges = np.append(slice_edges, edge)
             else:
                 fl = False
 
         return slice_edges
-
-    def test(self):
-        mesh_slice = MeshSlice(self.contour)
-        self.slice_edges = np.empty(dtype=object, shape=0)
-        e1 = self.edge_list.get_edge((4, 4, 4, 8))
-        e2 = self.edge_list.get_edge((4, 0, 4, 4))
-        v1 = self.vertex_list.get_vertex((8, 8))
-        v2 = self.vertex_list.get_vertex((8, 0))
-        self.slice_edges = np.append(self.slice_edges, e1)
-        self.slice_edges = np.append(self.slice_edges, e2)
-        self.list1, self.list2 = mesh_slice.slice_mesh(v1, v2,
-                                                       self.slice_edges)
 
     def __break_on_trough(self, current_v, get_max_edge, condition):
         while condition(current_v):
