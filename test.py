@@ -1,7 +1,6 @@
 import mesh_structure.list_numpy as ln
 import tree_view.meshDrawer as md
 import time
-from mesh_structure.MeshSlice import MeshSlice
 
 # W katalogu mesh_tests znajdują się dwwa pliki do testów:
 # duży_test.txt oraz test1.txt.
@@ -26,7 +25,7 @@ mesh = ln.load_file(fileName)
 mesh = ln.add_points(mesh)
 mesh = ln.create_mesh_structure(mesh)
 
-print ([ str(e) for e in mesh.contour])
+print ([ str(e) for e in mesh.contour.contour])
     
 end_time = int(round(time.time() * 100000))
 print('czas: ' + str((end_time - start_time)/100000) + 's')
