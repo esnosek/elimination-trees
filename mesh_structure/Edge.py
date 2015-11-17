@@ -27,8 +27,8 @@ class Edge:
                 str(self.v2.x) + ", " + str(self.v2.y) + "]")
 
     def __eq__(self, other):
-        return ((self.v1 == other.v1 or self.v1 == other.v2) and
-                (self.v2 == other.v1 or self.v2 == other.v2))
+        return ((self.v1 == other.v1 and self.v2 == other.v2) and
+                (self.v1 == other.v2 and self.v1 == other.v2))
 
     def __ne__(self, other):
         return not self.__eq__(other)

@@ -40,85 +40,65 @@ class Mesh:
         return contour_edges
 
     def __get_top_border(self):
-        start_v = self.upper_left_vertex
-        end_v = self.upper_right_vertex
-        condition = (lambda start_v, end_v: start_v.x < end_v.x)
-        get_edge = (lambda v: v.right_edges.get_longest_edge())
-        slice_edges = np.empty(dtype=object, shape=0)
-        edge = get_edge(start_v)
-        slice_edges = np.append(slice_edges, edge)
-        fl = True
-        while condition(edge.v1, end_v) and fl:
-            if condition(edge.v2, end_v):
+        border_vertices = np.empty(dtype=object, shape=0)
+        current_edge = self.upper_left_vertex.right_edges.get_longest_edge()
+        border_vertices = np.append(border_vertices, current_edge.v1)
+        while current_edge.v1.x < self.upper_right_vertex.x:
+            if current_edge.v2.x < self.upper_right_vertex.x:
                 try:
-                    edge = get_edge(edge.v2)
+                    current_edge = current_edge.v2.right_edges.get_longest_edge()
+                    border_vertices = np.append(border_vertices,
+                                                current_edge.v1)
                 except ValueError:
                     continue
-                slice_edges = np.append(slice_edges, edge)
             else:
-                fl = False
-
-        return slice_edges
+                break
+        return border_vertices
 
     def __get_right_border(self):
-        start_v = self.upper_right_vertex
-        end_v = self.lower_right_vertex
-        condition = (lambda start_v, end_v: start_v.y > end_v.y)
-        get_edge = (lambda v: v.bottom_edges.get_longest_edge())
-        slice_edges = np.empty(dtype=object, shape=0)
-        edge = get_edge(start_v)
-        slice_edges = np.append(slice_edges, edge)
-        fl = True
-        while condition(edge.v2, end_v) and fl:
-            if condition(edge.v1, end_v):
+        border_vertices = np.empty(dtype=object, shape=0)
+        current_edge = self.upper_right_vertex.bottom_edges.get_longest_edge()
+        border_vertices = np.append(border_vertices, current_edge.v2)
+        while current_edge.v2.y > self.lower_right_vertex.y:
+            if current_edge.v1.y > self.lower_right_vertex.y:
                 try:
-                    edge = get_edge(edge.v1)
+                    current_edge = current_edge.v1.bottom_edges.get_longest_edge()
+                    border_vertices = np.append(border_vertices,
+                                                current_edge.v2)
                 except ValueError:
                     continue
-                slice_edges = np.append(slice_edges, edge)
             else:
-                fl = False
-
-        return slice_edges
+                break
+        return border_vertices
 
     def __get_bottom_border(self):
-        start_v = self.lower_right_vertex
-        end_v = self.lower_left_vertex
-        condition = (lambda start_v, end_v: start_v.x > end_v.x)
-        get_edge = (lambda v: v.left_edges.get_longest_edge())
-        slice_edges = np.empty(dtype=object, shape=0)
-        edge = get_edge(start_v)
-        slice_edges = np.append(slice_edges, edge)
-        fl = True
-        while condition(edge.v2, end_v) and fl:
-            if condition(edge.v1, end_v):
+        border_vertices = np.empty(dtype=object, shape=0)
+        current_edge = self.lower_right_vertex.left_edges.get_longest_edge()
+        border_vertices = np.append(border_vertices, current_edge.v2)
+        while current_edge.v2.x > self.lower_left_vertex.x:
+            if current_edge.v1.x > self.lower_left_vertex.x:
                 try:
-                    edge = get_edge(edge.v1)
+                    current_edge = current_edge.v1.left_edges.get_longest_edge()
+                    border_vertices = np.append(border_vertices,
+                                                current_edge.v2)
                 except ValueError:
                     continue
-                slice_edges = np.append(slice_edges, edge)
             else:
-                fl = False
-
-        return slice_edges
+                break
+        return border_vertices
 
     def __get_left_border(self):
-        start_v = self.lower_left_vertex
-        end_v = self.upper_left_vertex
-        condition = (lambda start_v, end_v: start_v.y < end_v.y)
-        get_edge = (lambda v: v.top_edges.get_longest_edge())
-        slice_edges = np.empty(dtype=object, shape=0)
-        edge = get_edge(start_v)
-        slice_edges = np.append(slice_edges, edge)
-        fl = True
-        while condition(edge.v1, end_v) and fl:
-            if condition(edge.v2, end_v):
+        border_vertices = np.empty(dtype=object, shape=0)
+        current_edge = self.lower_left_vertex.top_edges.get_longest_edge()
+        border_vertices = np.append(border_vertices, current_edge.v1)
+        while current_edge.v1.y < self.upper_left_vertex.y:
+            if current_edge.v2.y < self.upper_left_vertex.y:
                 try:
-                    edge = get_edge(edge.v2)
+                    current_edge = current_edge.v2.top_edges.get_longest_edge()
+                    border_vertices = np.append(border_vertices,
+                                                current_edge.v1)
                 except ValueError:
                     continue
-                slice_edges = np.append(slice_edges, edge)
             else:
-                fl = False
-
-        return slice_edges
+                break
+        return border_vertices

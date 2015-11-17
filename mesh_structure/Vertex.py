@@ -56,12 +56,7 @@ class Vertex:
         self.face_incident_tree.insert(key, f)
 
     def __str__(self):
-        s = ("[" + str(self.x) + ", " + str(self.y) + "]") + "\n"
-        for key in self.edge_incident_tree:
-            edge = self.edge_incident_tree[key]
-            s = s + ("    " + str(edge)) + "\n"
-        for face in self.face_incident_tree:
-            s = s + ("        " + str(face)) + "\n"
+        s = ("[" + str(self.x) + ", " + str(self.y) + "]")
         return s
 
     def __eq__(self, other):

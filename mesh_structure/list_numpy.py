@@ -45,15 +45,12 @@ def create_mesh_structure(mesh):
 
     return Mesh(vertex_list, edge_list, face_list)
 
-
     def visit_face(self, face):
-       # print('jestemss jestem')
         self.visited_list = np.append(self.visited_list, face)
         for edge in face.edge_list:
             if (edge not in self.visited_edge) and (edge not in self.contour):
                 self.visited_edge = np.append(self.visited_edge, edge)
                 for f_key in edge.face_incident:
-                    #print(f_key)
                     next_face = edge.face_incident[f_key]
                     if (next_face != face) and (next_face not in self.visited_list):
                         self.visit_face(next_face)
@@ -63,3 +60,33 @@ def create_mesh_structure(mesh):
         first_face = min(first_edge.face_incident)
         first_face = first_edge.face_incident[first_face]
         self.visit_face(first_face)
+
+    def test_slice():
+        v1 = mesh.vertex_list.get_vertex((12, 8))
+        v2 = mesh.vertex_list.get_vertex((12, 4))
+        v3 = mesh.vertex_list.get_vertex((8, 4))
+        v4 = mesh.vertex_list.get_vertex((4, 4))
+        v5 = mesh.vertex_list.get_vertex((4, 0))
+        slice_vertices = np.empty(dtype=object, shape=0)
+        slice_vertices = np.append(slice_vertices, v1)
+        slice_vertices = np.append(slice_vertices, v2)
+        slice_vertices = np.append(slice_vertices, v3)
+        slice_vertices = np.append(slice_vertices, v4)
+        slice_vertices = np.append(slice_vertices, v5)
+
+        mesh.contour.slice_contour(slice_vertices)
+
+    def slice_contour(self, start_v, end_v, slice_edges):
+
+        index_e1 = np.where(self.contour == start_v)
+        index_e2 = np.where(self.contour == end_v)
+
+        edge_list_1 = self.contour[index_e1:index_e2]
+        edge_list_1 = np.append(edge_list_1, slice_edges[::-1])
+
+        edge_list_2 = self.contour[:index_e1]
+        edge_list_3 = self.contour[index_e2:]
+        edge_list_2 = np.append(edge_list_2, slice_edges)
+        edge_list_2 = np.append(edge_list_2, edge_list_3)
+
+        return edge_list_1, edge_list_2
