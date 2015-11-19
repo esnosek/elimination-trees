@@ -18,7 +18,7 @@ class EdgeBunch:
         else:
             return self.edge_incident[max(self.edge_incident)]
 
-    def edge_exists(self, direction):
+    def is_empty(self):
         if self.edge_incident.is_empty():
             return True
         else:

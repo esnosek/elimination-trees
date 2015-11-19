@@ -14,7 +14,7 @@ class Mesh:
         self.upper_left_vertex = self.__get_upper_left_vertex()
         self.upper_right_vertex = self.__get_upper_right_vertex()
         self.lower_right_vertex = self.__get_lower_right_vertex()
-        self.contour = MeshContour(self.__create_mesh_contour())
+        self.contour = MeshContour(self.__create_mesh_contour(), self)
 
     def __get_lower_left_vertex(self):
         return self.vertex_list.get_vertex((0, 0))

@@ -9,7 +9,7 @@ class Edge:
         # trzeba zadbac zeby v1 < v2
         self.v1 = v1
         self.v2 = v2
-        self.__set_length()
+        self.length = self.__set_length()
         self.face_incident = bt.FastRBTree()
 
     def add_incident_face(self, f):
@@ -18,9 +18,9 @@ class Edge:
 
     def __set_length(self):
         if (self.v1.x == self.v2.x):
-            self.length = abs(self.v1.y - self.v2.y)
+            return abs(self.v1.y - self.v2.y)
         else:
-            self.length = abs(self.v1.x - self.v2.x)
+            return abs(self.v1.x - self.v2.x)
 
     def __str__(self):
         return ("[" + str(self.v1.x) + ", " + str(self.v1.y) + "], [" +
