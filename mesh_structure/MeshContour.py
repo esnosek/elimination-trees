@@ -31,6 +31,7 @@ class MeshContour:
                 curr_index = curr_index + 1
         self.slice_vertices_1 = np.append(self.slice_vertices_1, slice_vertices[last_index])
         self.slice_vertices_2 = np.append(self.slice_vertices_2, slice_vertices[last_index])
+
         print("pierwsza lista: ")
         for v in self.slice_vertices_1:
             print(v)
@@ -41,16 +42,12 @@ class MeshContour:
     def __add_vertices_beetween_two_vertex(self, v1, v2):
         vector_direction = self.__get_vector_direction(v1, v2)
         if vector_direction == Direction.top:
-            print("top")
             self.__add_vertices_from_top_directed_vector(v1, v2)
         if vector_direction == Direction.right:
-            print("right")
             self.__add_vertices_from_right_directed_vector(v1, v2)
         if vector_direction == Direction.bottom:
-            print("bottom")
             self.__add_vertices_from_bottom_directed_vector(v1, v2)
         if vector_direction == Direction.left:
-            print("left")
             self.__add_vertices_from_left_directed_vector(v1, v2)
 
     def __get_vector_direction(self, v1, v2):
@@ -84,6 +81,7 @@ class MeshContour:
         return False
 
     def __add_vertices_from_top_directed_vector(self, v1, v2):
+        # krawedz skierowana w gore, wiec v1 < v2
         vertices_beetween = self.mesh.vertex_list.vertex_tree[(v1.x, v1.y):(v2.x, v2.y)]
         for key in vertices_beetween:
             vertex = vertices_beetween[key]
@@ -94,82 +92,100 @@ class MeshContour:
                     self.slice_vertices_2 = np.append(self.slice_vertices_2, vertex)
 
     def __add_vertices_from_right_directed_vector(self, v1, v2):
-        pass
+        # krawedz skierowana w prawo, wiec v1 < v2
+        vertices_beetween = self.mesh.vertex_list.vertex_tree_y_sorted[(v1.y, v1.x):(v2.y, v2.x)]
+        for key in vertices_beetween:
+            vertex = vertices_beetween[key]
+            if vertex != v1 and vertex != v2:
+                if not vertex.top_edges.is_empty():
+                    self.slice_vertices_1 = np.append(self.slice_vertices_1,  vertex)
+                if not vertex.bottom_edges.is_empty():
+                    self.slice_vertices_2 = np.append(self.slice_vertices_2, vertex)
 
     def __add_vertices_from_bottom_directed_vector(self, v1, v2):
-        # krawedz skierowana w dół, wiec wiemy, że v1 > v2
+        # krawedz skierowana w dół, wiec v1 > v2
         vertices_beetween = self.mesh.vertex_list.vertex_tree[(v2.x, v2.y):(v1.x, v1.y)]
         size_of_slice_vertices_1 = self.slice_vertices_1.size
         size_of_slice_vertices_2 = self.slice_vertices_2.size
         for key in vertices_beetween:
             vertex = vertices_beetween[key]
             if vertex != v1 and vertex != v2:
-                if not vertex.left_edges.is_empty():
-                    self.slice_vertices_1 = np.insert(self.slice_vertices_1, size_of_slice_vertices_1, vertex)
                 if not vertex.right_edges.is_empty():
+                    self.slice_vertices_1 = np.insert(self.slice_vertices_1, size_of_slice_vertices_1, vertex)
+                if not vertex.left_edges.is_empty():
                     self.slice_vertices_2 = np.insert(self.slice_vertices_2, size_of_slice_vertices_2, vertex)
 
     def __add_vertices_from_left_directed_vector(self, v1, v2):
-        pass
+        # krawedz skierowana w lewo, wiec v1 > v2
+        vertices_beetween = self.mesh.vertex_list.vertex_tree_y_sorted[(v2.y, v2.x):(v1.y, v1.x)]
+        size_of_slice_vertices_1 = self.slice_vertices_1.size
+        size_of_slice_vertices_2 = self.slice_vertices_2.size
+        for key in vertices_beetween:
+            vertex = vertices_beetween[key]
+            if vertex != v1 and vertex != v2:
+                if not vertex.bottom_edges.is_empty():
+                    self.slice_vertices_1 = np.insert(self.slice_vertices_1, size_of_slice_vertices_1, vertex)
+                if not vertex.top_edges.is_empty():
+                    self.slice_vertices_2 = np.insert(self.slice_vertices_2, size_of_slice_vertices_2, vertex)
 
-    def __remove_useless_edges_depending_on_neihbors_direction(v, dir1, dir2):
+    def __remove_useless_edges_depending_on_neihbors_direction(self, v, dir1, dir2):
         if dir1 == Direction.top and dir2 == Direction.top:
-            __remove_useless_edges_top_top()
+            self.__remove_edges_from_vertex_beetwen_top_and_top_vectors()
         if dir1 == Direction.top and dir2 == Direction.right:
-            __remove_useless_edges_top_right()
+            self.__remove_edges_from_vertex_beetwen_top_and_right_vectors()
         if dir1 == Direction.top and dir2 == Direction.left:
-            __remove_useless_edges_top_left()
+            self.__remove_edges_from_vertex_beetwen_top_and_left_vectors()
         if dir1 == Direction.right and dir2 == Direction.top:
-            __remove_useless_edges_right_top()
+            self.__remove_edges_from_vertex_beetwen_right_and_top_vectors()
         if dir1 == Direction.right and dir2 == Direction.right:
-            __remove_useless_edges_right_right()
+            self.__remove_edges_from_vertex_beetwen_right_and_right_vectors()
         if dir1 == Direction.right and dir2 == Direction.bottom:
-            __remove_useless_edges_right_bottom()
+            self.__remove_edges_from_vertex_beetwen_right_and_bottom_vectors()
         if dir1 == Direction.bottom and dir2 == Direction.right:
-            __remove_useless_edges_bottom_right()
+            self.__remove_edges_from_vertex_beetwen_bottom_and_right_vectors()
         if dir1 == Direction.bottom and dir2 == Direction.bottom:
-            __remove_useless_edges_bottom_bottom()
+            self.__remove_edges_from_vertex_beetwen_bottom_and_bottom_vectors()
         if dir1 == Direction.bottom and dir2 == Direction.left:
-            __remove_useless_edges_bottom_left()
+            self.__remove_edges_from_vertex_beetwen_bottom_and_left_vectors()
         if dir1 == Direction.left and dir2 == Direction.top:
-            __remove_useless_edges_left_top()
+            self.__remove_edges_from_vertex_beetwen_left_and_top_vectors()
         if dir1 == Direction.left and dir2 == Direction.bottom:
-            __remove_useless_edges_left_bottom()
+            self.__remove_edges_from_vertex_beetwen_left_and_bottom_vectors()
         if dir1 == Direction.left and dir2 == Direction.left:
-            __remove_useless_edges_left_left()
+            self.__remove_edges_from_vertex_beetwen_left_and_left_vectors()
 
-    def __remove_useless_edges_top_top():
+    def __remove_edges_from_vertex_beetwen_top_and_top_vectors(self):
         pass
 
-    def __remove_useless_edges_top_right():
+    def __remove_edges_from_vertex_beetwen_top_and_right_vectors(self):
         pass
 
-    def __remove_useless_edges_top_left():
+    def __remove_edges_from_vertex_beetwen_top_and_left_vectors(self):
         pass
 
-    def __remove_useless_edges_right_top():
+    def __remove_edges_from_vertex_beetwen_right_and_top_vectors(self):
         pass
 
-    def __remove_useless_edges_right_right():
+    def __remove_edges_from_vertex_beetwen_right_and_right_vectors(self):
         pass
 
-    def __remove_useless_edges_right_bottom():
+    def __remove_edges_from_vertex_beetwen_right_and_bottom_vectors(self):
         pass
 
-    def __remove_useless_edges_bottom_right():
+    def __remove_edges_from_vertex_beetwen_bottom_and_right_vectors(self):
         pass
 
-    def __remove_useless_edges_bottom_bottom():
+    def __remove_edges_from_vertex_beetwen_bottom_and_bottom_vectors(self):
         pass
 
-    def __remove_useless_edges_bottom_left():
+    def __remove_edges_from_vertex_beetwen_bottom_and_left_vectors(self):
         pass
 
-    def __remove_useless_edges_left_top():
+    def __remove_edges_from_vertex_beetwen_left_and_top_vectors(self):
         pass
 
-    def __remove_useless_edges_left_bottom():
+    def __remove_edges_from_vertex_beetwen_left_and_bottom_vectors(self):
         pass
 
-    def __remove_useless_edges_left_left():
+    def __remove_edges_from_vertex_beetwen_left_and_left_vectors(self):
         pass

@@ -77,8 +77,8 @@ def test_slice(mesh):
     slice_vertices = np.append(slice_vertices, v4)
     slice_vertices = np.append(slice_vertices, v5)
 
-    v21 = mesh.vertex_list.get_vertex((6, 0))
-    v22 = mesh.vertex_list.get_vertex((6, 4))
+    v21 = mesh.vertex_list.get_vertex((6, 4))
+    v22 = mesh.vertex_list.get_vertex((6, 0))
     slice_vertices2 = np.empty(dtype=object, shape=0)
     slice_vertices2 = np.append(slice_vertices2, v21)
     slice_vertices2 = np.append(slice_vertices2, v22)
