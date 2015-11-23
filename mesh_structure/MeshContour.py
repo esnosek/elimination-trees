@@ -2,7 +2,7 @@
 
 import numpy as np
 from mesh_structure.Direction import Direction
-
+from copy import deepcopy
 
 class MeshContour:
 
@@ -15,22 +15,24 @@ class MeshContour:
     def slice_contour(self, slice_vertices):
         last_index = slice_vertices.size - 1
         curr_index = 1
+        prev_v = slice_vertices[curr_index - 1]
+        self.slice_vertices_1 = np.append(self.slice_vertices_1, deepcopy(prev_v))
+        self.slice_vertices_2 = np.append(self.slice_vertices_2, deepcopy(prev_v))
+        # __remove_edges_from_first_vertex()
         while True:
             prev_v = slice_vertices[curr_index - 1]
             curr_v = slice_vertices[curr_index]
-            self.slice_vertices_1 = np.append(self.slice_vertices_1, prev_v)
-            self.slice_vertices_2 = np.append(self.slice_vertices_2, prev_v)
             self.__add_vertices_beetween_two_vertex(prev_v, curr_v)
+            self.slice_vertices_1 = np.append(self.slice_vertices_1, deepcopy(curr_v))
+            self.slice_vertices_2 = np.append(self.slice_vertices_2, deepcopy(curr_v))
             if curr_index == last_index:
                 break
             else:
                 next_v = slice_vertices[curr_index + 1]
-                dir1 = self.__get_vector_direction(prev_v, curr_v)
-                dir2 = self.__get_vector_direction(curr_v, next_v)
-                self.__remove_useless_edges_depending_on_neihbors_direction(curr_v, dir1, dir2)
+                self.__remove_useless_edges_depending_on_neihbors_direction(prev_v, curr_v, next_v)
                 curr_index = curr_index + 1
-        self.slice_vertices_1 = np.append(self.slice_vertices_1, slice_vertices[last_index])
-        self.slice_vertices_2 = np.append(self.slice_vertices_2, slice_vertices[last_index])
+
+        # __remove_edges_from_last_vertex()
 
         print("pierwsza lista: ")
         for v in self.slice_vertices_1:
@@ -128,64 +130,80 @@ class MeshContour:
                 if not vertex.top_edges.is_empty():
                     self.slice_vertices_2 = np.insert(self.slice_vertices_2, size_of_slice_vertices_2, vertex)
 
-    def __remove_useless_edges_depending_on_neihbors_direction(self, v, dir1, dir2):
+    def __remove_useless_edges_depending_on_neihbors_direction(self, prev_v, curr_v, next_v):
+        dir1 = self.__get_vector_direction(prev_v, curr_v)
+        dir2 = self.__get_vector_direction(curr_v, next_v)
+        v_from_list_1 = self.slice_vertices_1[self.slice_vertices_1.size - 1]
+        v_from_list_2 = self.slice_vertices_2[self.slice_vertices_2.size - 1]
         if dir1 == Direction.top and dir2 == Direction.top:
-            self.__remove_edges_from_vertex_beetwen_top_and_top_vectors()
+            self.__remove_edges_from_vertex_beetwen_top_and_top_vectors(v_from_list_1, v_from_list_2)
         if dir1 == Direction.top and dir2 == Direction.right:
-            self.__remove_edges_from_vertex_beetwen_top_and_right_vectors()
+            self.__remove_edges_from_vertex_beetwen_top_and_right_vectors(v_from_list_1, v_from_list_2)
         if dir1 == Direction.top and dir2 == Direction.left:
-            self.__remove_edges_from_vertex_beetwen_top_and_left_vectors()
+            self.__remove_edges_from_vertex_beetwen_top_and_left_vectors(v_from_list_1, v_from_list_2)
         if dir1 == Direction.right and dir2 == Direction.top:
-            self.__remove_edges_from_vertex_beetwen_right_and_top_vectors()
+            self.__remove_edges_from_vertex_beetwen_right_and_top_vectors(v_from_list_1, v_from_list_2)
         if dir1 == Direction.right and dir2 == Direction.right:
-            self.__remove_edges_from_vertex_beetwen_right_and_right_vectors()
+            self.__remove_edges_from_vertex_beetwen_right_and_right_vectors(v_from_list_1, v_from_list_2)
         if dir1 == Direction.right and dir2 == Direction.bottom:
-            self.__remove_edges_from_vertex_beetwen_right_and_bottom_vectors()
+            self.__remove_edges_from_vertex_beetwen_right_and_bottom_vectors(v_from_list_1, v_from_list_2)
         if dir1 == Direction.bottom and dir2 == Direction.right:
-            self.__remove_edges_from_vertex_beetwen_bottom_and_right_vectors()
+            self.__remove_edges_from_vertex_beetwen_bottom_and_right_vectors(v_from_list_1, v_from_list_2)
         if dir1 == Direction.bottom and dir2 == Direction.bottom:
-            self.__remove_edges_from_vertex_beetwen_bottom_and_bottom_vectors()
+            self.__remove_edges_from_vertex_beetwen_bottom_and_bottom_vectors(v_from_list_1, v_from_list_2)
         if dir1 == Direction.bottom and dir2 == Direction.left:
-            self.__remove_edges_from_vertex_beetwen_bottom_and_left_vectors()
+            self.__remove_edges_from_vertex_beetwen_bottom_and_left_vectors(v_from_list_1, v_from_list_2)
         if dir1 == Direction.left and dir2 == Direction.top:
-            self.__remove_edges_from_vertex_beetwen_left_and_top_vectors()
+            self.__remove_edges_from_vertex_beetwen_left_and_top_vectors(v_from_list_1, v_from_list_2)
         if dir1 == Direction.left and dir2 == Direction.bottom:
-            self.__remove_edges_from_vertex_beetwen_left_and_bottom_vectors()
+            self.__remove_edges_from_vertex_beetwen_left_and_bottom_vectors(v_from_list_1, v_from_list_2)
         if dir1 == Direction.left and dir2 == Direction.left:
-            self.__remove_edges_from_vertex_beetwen_left_and_left_vectors()
+            self.__remove_edges_from_vertex_beetwen_left_and_left_vectors(v_from_list_1, v_from_list_2)
 
-    def __remove_edges_from_vertex_beetwen_top_and_top_vectors(self):
-        pass
+    def __remove_edges_from_vertex_beetwen_top_and_top_vectors(self, v1, v2):
+        v1.remove_right_edges()
+        v2.remove_left_edges()
 
-    def __remove_edges_from_vertex_beetwen_top_and_right_vectors(self):
-        pass
+    def __remove_edges_from_vertex_beetwen_top_and_right_vectors(self, v1, v2):
+        v2.remove_top_edges()
+        v2.remove_left_edges()
 
-    def __remove_edges_from_vertex_beetwen_top_and_left_vectors(self):
-        pass
+    def __remove_edges_from_vertex_beetwen_top_and_left_vectors(self, v1, v2):
+        v1.remove_top_edges()
+        v1.remove_right_edges()
 
-    def __remove_edges_from_vertex_beetwen_right_and_top_vectors(self):
-        pass
+    def __remove_edges_from_vertex_beetwen_right_and_top_vectors(self, v1, v2):
+        v1.remove_bottom_edges()
+        v1.remove_right_edges()
 
-    def __remove_edges_from_vertex_beetwen_right_and_right_vectors(self):
-        pass
+    def __remove_edges_from_vertex_beetwen_right_and_right_vectors(self, v1, v2):
+        v1.remove_bottom_edges()
+        v2.remove_top_edges()
 
-    def __remove_edges_from_vertex_beetwen_right_and_bottom_vectors(self):
-        pass
+    def __remove_edges_from_vertex_beetwen_right_and_bottom_vectors(self, v1, v2):
+        v2.remove_top_edges()
+        v2.remove_right_edges()
 
-    def __remove_edges_from_vertex_beetwen_bottom_and_right_vectors(self):
-        pass
+    def __remove_edges_from_vertex_beetwen_bottom_and_right_vectors(self, v1, v2):
+        v1.remove_bottom_edges()
+        v1.remove_left_edges()
 
-    def __remove_edges_from_vertex_beetwen_bottom_and_bottom_vectors(self):
-        pass
+    def __remove_edges_from_vertex_beetwen_bottom_and_bottom_vectors(self, v1, v2):
+        v1.remove_left_edges()
+        v2.remove_right_edges()
 
-    def __remove_edges_from_vertex_beetwen_bottom_and_left_vectors(self):
-        pass
+    def __remove_edges_from_vertex_beetwen_bottom_and_left_vectors(self, v1, v2):
+        v2.remove_bottom_edges()
+        v2.remove_right_edges()
 
-    def __remove_edges_from_vertex_beetwen_left_and_top_vectors(self):
-        pass
+    def __remove_edges_from_vertex_beetwen_left_and_top_vectors(self, v1, v2):
+        v2.remove_bottom_edges()
+        v2.remove_left_edges()
 
-    def __remove_edges_from_vertex_beetwen_left_and_bottom_vectors(self):
-        pass
+    def __remove_edges_from_vertex_beetwen_left_and_bottom_vectors(self, v1, v2):
+        v1.remove_top_edges()
+        v1.remove_left_edges()
 
-    def __remove_edges_from_vertex_beetwen_left_and_left_vectors(self):
-        pass
+    def __remove_edges_from_vertex_beetwen_left_and_left_vectors(self, v1, v2):
+        v1.remove_top_edges()
+        v2.remove_bottom_edges()

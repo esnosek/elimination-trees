@@ -2,7 +2,7 @@
 
 import numpy as np
 from mesh_structure.MeshContour import MeshContour
-
+from copy import deepcopy
 
 class Mesh:
 
@@ -42,13 +42,13 @@ class Mesh:
     def __get_top_border(self):
         border_vertices = np.empty(dtype=object, shape=0)
         current_edge = self.upper_left_vertex.right_edges.get_longest_edge()
-        border_vertices = np.append(border_vertices, current_edge.v1)
+        border_vertices = np.append(border_vertices, deepcopy(current_edge.v1))
         while current_edge.v1.x < self.upper_right_vertex.x:
             if current_edge.v2.x < self.upper_right_vertex.x:
                 try:
                     current_edge = current_edge.v2.right_edges.get_longest_edge()
                     border_vertices = np.append(border_vertices,
-                                                current_edge.v1)
+                                                deepcopy(current_edge.v1))
                 except ValueError:
                     continue
             else:
@@ -58,13 +58,13 @@ class Mesh:
     def __get_right_border(self):
         border_vertices = np.empty(dtype=object, shape=0)
         current_edge = self.upper_right_vertex.bottom_edges.get_longest_edge()
-        border_vertices = np.append(border_vertices, current_edge.v2)
+        border_vertices = np.append(border_vertices, deepcopy(current_edge.v2))
         while current_edge.v2.y > self.lower_right_vertex.y:
             if current_edge.v1.y > self.lower_right_vertex.y:
                 try:
                     current_edge = current_edge.v1.bottom_edges.get_longest_edge()
                     border_vertices = np.append(border_vertices,
-                                                current_edge.v2)
+                                                deepcopy(current_edge.v2))
                 except ValueError:
                     continue
             else:
@@ -74,13 +74,13 @@ class Mesh:
     def __get_bottom_border(self):
         border_vertices = np.empty(dtype=object, shape=0)
         current_edge = self.lower_right_vertex.left_edges.get_longest_edge()
-        border_vertices = np.append(border_vertices, current_edge.v2)
+        border_vertices = np.append(border_vertices, deepcopy(current_edge.v2))
         while current_edge.v2.x > self.lower_left_vertex.x:
             if current_edge.v1.x > self.lower_left_vertex.x:
                 try:
                     current_edge = current_edge.v1.left_edges.get_longest_edge()
                     border_vertices = np.append(border_vertices,
-                                                current_edge.v2)
+                                                deepcopy(current_edge.v2))
                 except ValueError:
                     continue
             else:
@@ -90,13 +90,13 @@ class Mesh:
     def __get_left_border(self):
         border_vertices = np.empty(dtype=object, shape=0)
         current_edge = self.lower_left_vertex.top_edges.get_longest_edge()
-        border_vertices = np.append(border_vertices, current_edge.v1)
+        border_vertices = np.append(border_vertices, deepcopy(current_edge.v1))
         while current_edge.v1.y < self.upper_left_vertex.y:
             if current_edge.v2.y < self.upper_left_vertex.y:
                 try:
                     current_edge = current_edge.v2.top_edges.get_longest_edge()
                     border_vertices = np.append(border_vertices,
-                                                current_edge.v1)
+                                                deepcopy(current_edge.v1))
                 except ValueError:
                     continue
             else:

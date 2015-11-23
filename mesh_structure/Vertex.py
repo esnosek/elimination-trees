@@ -17,6 +17,7 @@ class Vertex:
         self.bottom_edges = EdgeBunch(Direction.bottom)
         self.left_edges = EdgeBunch(Direction.left)
         self.face_incident_tree = bt.FastRBTree()
+        self.is_border_vertex = False
 
     def add_incident_edge(self, edge):
         if edge.v1 == self:
@@ -26,31 +27,43 @@ class Vertex:
 
         if self.x == v.x:
             if self.y < v.y:
-                self.__add_top_edge(edge)
+                self.add_top_edge(edge)
             else:
-                self.__add_bottom_edge(edge)
+                self.add_bottom_edge(edge)
         else:
             if self.x < v.x:
-                self.__add_right_edge(edge)
+                self.add_right_edge(edge)
             else:
-                self.__add_left_edge(edge)
+                self.add_left_edge(edge)
 
-    def __add_top_edge(self, edge):
+    def add_top_edge(self, edge):
         key = (Direction.top, edge.length)
         self.top_edges.add_incident_edge(key, edge)
 
-    def __add_right_edge(self, edge):
+    def add_right_edge(self, edge):
         key = (Direction.right, edge.length)
         self.right_edges.add_incident_edge(key, edge)
 
-    def __add_bottom_edge(self, edge):
+    def add_bottom_edge(self, edge):
         key = (Direction.bottom, edge.length)
         self.bottom_edges.add_incident_edge(key, edge)
 
-    def __add_left_edge(self, edge):
+    def add_left_edge(self, edge):
         key = (Direction.left, edge.length)
         self.left_edges.add_incident_edge(key, edge)
 
+    def remove_top_edges(self):
+        self.top_edges.edge_incident.clear()
+
+    def remove_right_edges(self):
+        self.right_edges.edge_incident.clear()
+
+    def remove_bottom_edges(self):
+        self.bottom_edges.edge_incident.clear()
+
+    def remove_left_edges(self):
+        self.left_edges.edge_incident.clear()
+        
     def add_incident_face(self, f):
         key = (f.level, f.id)
         self.face_incident_tree.insert(key, f)
