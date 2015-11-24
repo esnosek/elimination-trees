@@ -19,6 +19,29 @@ class Vertex:
         self.face_incident_tree = bt.FastRBTree()
         self.is_border_vertex = False
 
+    def get_existing_edge_directions(self):
+        existing_directions = []
+        if not self.top_edges.is_empty():
+            existing_directions.append(Direction.top)
+        if not self.right_edges.is_empty():
+            existing_directions.append(Direction.right)
+        if not self.bottom_edges.is_empty():
+            existing_directions.append(Direction.bottom)
+        if not self.left_edges.is_empty():
+            existing_directions.append(Direction.left)
+        return existing_directions
+
+    def get_shortest_edge_in_direction(self, direction):
+        if direction == Direction.top:
+            return self.top_edges.get_shortest_edge()
+        elif direction == Direction.right:
+            return self.right_edges.get_shortest_edge()
+        elif direction == Direction.bottom:
+            return self.bottom_edges.get_shortest_edge()
+        else direction == Direction.left:
+            return self.left_edges.get_shortest_edge()
+
+
     def add_incident_edge(self, edge):
         if edge.v1 == self:
             v = edge.v2
