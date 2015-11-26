@@ -38,7 +38,8 @@ class Vertex:
             return self.right_edges.get_shortest_edge()
         elif direction == Direction.bottom:
             return self.bottom_edges.get_shortest_edge()
-        else direction == Direction.left:
+        else: 
+            direction == Direction.left
             return self.left_edges.get_shortest_edge()
 
 
