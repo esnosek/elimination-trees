@@ -3,6 +3,7 @@
 import numpy as np
 from mesh_structure.Direction import Direction
 from copy import deepcopy
+import tree_view.meshDrawer as md
 
 class MeshContour:
 
@@ -16,9 +17,10 @@ class MeshContour:
         last_index = slice_vertices.size - 1
         curr_index = 1
         prev_v = slice_vertices[curr_index - 1]
+        curr_v = slice_vertices[curr_index]
         self.slice_vertices_1 = np.append(self.slice_vertices_1, deepcopy(prev_v))
         self.slice_vertices_2 = np.append(self.slice_vertices_2, deepcopy(prev_v))
-        # __remove_edges_from_first_vertex()
+        self.__remove_edges_from_first_vertex(curr_v)
         while True:
             prev_v = slice_vertices[curr_index - 1]
             curr_v = slice_vertices[curr_index]
@@ -32,15 +34,36 @@ class MeshContour:
                 self.__remove_useless_edges_depending_on_neihbors_direction(prev_v, curr_v, next_v)
                 curr_index = curr_index + 1
 
-        # __remove_edges_from_last_vertex()
+        self.__remove_edges_from_last_vertex(prev_v)
+            
+        list1, list2 = self.__slice_contour(self.slice_vertices_1, self.slice_vertices_2)
+        return list1, list2
 
-        print("pierwsza lista: ")
-        for v in self.slice_vertices_1:
-            print(v)
-        print("druga lista: ")
-        for v in self.slice_vertices_2:
-            print(v)
+    def __remove_edges_from_first_vertex(self, next_v):
+        self.__remove_edgres_from_first_vertex_from_list_1(next_v)
+        self.__remove_edgres_from_first_vertex_from_list_2(next_v)  
 
+    def __remove_edgres_from_first_vertex_from_list_1(self, next_v):
+        curr_v_index = np.where(self.contour == self.slice_vertices_1[0])[0][0]
+        if curr_v_index == self.contour.size - 1:
+            prev_v_index = 0
+        else:
+            prev_v_index = curr_v_index + 1
+        prev_v = self.contour[prev_v_index]
+        curr_v = self.contour[curr_v_index]
+        self.__remove_useless_edges_depending_on_neihbors_direction(prev_v, curr_v, next_v)
+        
+    def __remove_edgres_from_first_vertex_from_list_2(self, next_v):
+        curr_v_index = np.where(self.contour == self.slice_vertices_2[0])[0][0]
+        if curr_v_index == 0:
+            prev_v_index = self.contour.size - 1
+        else:
+            prev_v_index = curr_v_index - 1
+        prev_v = self.contour[prev_v_index]
+        curr_v = self.contour[curr_v_index]
+        self.__remove_useless_edges_depending_on_neihbors_direction(prev_v, curr_v, next_v)
+        
+                
     def __add_vertices_beetween_two_vertex(self, v1, v2):
         vector_direction = self.__get_vector_direction(v1, v2)
         if vector_direction == Direction.top:
@@ -207,3 +230,43 @@ class MeshContour:
     def __remove_edges_from_vertex_beetwen_left_and_left_vectors(self, v1, v2):
         v1.remove_top_edges()
         v2.remove_bottom_edges()
+
+    def __remove_edges_from_last_vertex(self, prev_v):
+        self.__remove_edgres_from_last_vertex_from_list_1(prev_v)
+        self.__remove_edgres_from_last_vertex_from_list_2(prev_v)  
+
+    def __remove_edgres_from_last_vertex_from_list_1(self, prev_v):
+        curr_v_index = np.where(self.contour == self.slice_vertices_1[self.slice_vertices_1.size - 1])[0][0]
+        if curr_v_index == 0:
+            next_v_index = self.contour.size - 1
+        else:
+            next_v_index = curr_v_index - 1
+        next_v = self.contour[next_v_index]
+        curr_v = self.contour[curr_v_index]
+        self.__remove_useless_edges_depending_on_neihbors_direction(prev_v, curr_v, next_v)
+
+    def __remove_edgres_from_last_vertex_from_list_2(self, prev_v):
+        curr_v_index = np.where(self.contour == self.slice_vertices_2[self.slice_vertices_2.size - 1])[0][0]
+        if curr_v_index == self.contour.size - 1:
+            next_v_index = 0
+        else:
+            next_v_index = curr_v_index + 1
+        next_v = self.contour[next_v_index]
+        curr_v = self.contour[curr_v_index]
+        self.__remove_useless_edges_depending_on_neihbors_direction(prev_v, curr_v, next_v)
+    
+    def __slice_contour(self, slice_vertices_1, slice_vertices_2):
+        start_v = slice_vertices_1[0]
+        end_v = slice_vertices_1[slice_vertices_1.size - 1]
+        index_e1 = np.where(self.contour == start_v)[0][0]
+        index_e2 = np.where(self.contour == end_v)[0][0]
+
+        edge_list_1 = self.contour[index_e1 + 1:index_e2 - 1]
+        edge_list_1 = np.append(edge_list_1, slice_vertices_1[::-1])
+
+        edge_list_2 = self.contour[:index_e1 - 1]
+        edge_list_3 = self.contour[index_e2 + 1:]
+        edge_list_2 = np.append(edge_list_2, slice_vertices_2)
+        edge_list_2 = np.append(edge_list_2, edge_list_3)
+
+        return edge_list_1, edge_list_2
