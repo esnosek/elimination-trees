@@ -30,7 +30,10 @@ def get_possible_cuts(contour):
                     inside_direction = Direction.right
             
             if inside_direction:
-                used_cross_points = []
+                inside_edge = point_a.get_longest_edge_in_direction(inside_direction)
+                used_cross_points = [point_a]
+                point_a = get_second_edge_point(point_a, inside_edge)
+                
                 find_path(point_a, [point_b], inside_direction, used_cross_points, possible_paths)
                 
         return possible_paths
