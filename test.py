@@ -18,6 +18,8 @@ start_time = int(round(time.time() * 100000))
 
 mesh = create_mesh(fileName)
 
+#print(mesh.vertex_list.vertex_tree)
+
 end_time = int(round(time.time() * 100000))
 print('czas: ' + str((end_time - start_time)/100000) + 's')
 

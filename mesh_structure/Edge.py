@@ -11,7 +11,7 @@ class Edge:
         self.v2 = v2
         self.length = self.__set_length()
         self.face_incident = bt.FastRBTree()
-
+        
     def add_incident_face(self, f):
         key = (f.level, f.id)
         self.face_incident.insert(key, f)
