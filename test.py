@@ -14,9 +14,9 @@ start_time = int(round(time.time() * 100000))
 # print([str(v) for v in mesh.contour.contour])
 # mesh.contour.slice_contour()
 
+#ln.test_slice(mesh)
 
 mesh = create_mesh(fileName)
-ln.test_slice(mesh)
 
 end_time = int(round(time.time() * 100000))
 print('czas: ' + str((end_time - start_time)/100000) + 's')
