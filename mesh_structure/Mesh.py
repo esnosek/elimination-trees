@@ -30,14 +30,14 @@ class Mesh:
         return self.vertex_list.get_vertex((self.vertex_list.get_max_x(), 0))
 
     def __create_mesh_contour(self):
-        contour_edges = np.empty(dtype=object, shape=0)
+        contour_vertices = np.empty(dtype=object, shape=0)
 
-        contour_edges = np.append(contour_edges, self.__get_left_border())
-        contour_edges = np.append(contour_edges, self.__get_top_border())
-        contour_edges = np.append(contour_edges, self.__get_right_border())
-        contour_edges = np.append(contour_edges, self.__get_bottom_border())
+        contour_vertices = np.append(contour_vertices, self.__get_left_border())
+        contour_vertices = np.append(contour_vertices, self.__get_top_border())
+        contour_vertices = np.append(contour_vertices, self.__get_right_border())
+        contour_vertices = np.append(contour_vertices, self.__get_bottom_border())
 
-        return contour_edges
+        return contour_vertices
 
     def __get_top_border(self):
         border_vertices = np.empty(dtype=object, shape=0)

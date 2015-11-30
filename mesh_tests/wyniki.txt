@@ -1,0 +1,5 @@
+poziom ilosc_punktow_na_krawedzi ilosc_drog czas
+6 23 33969 134.548s
+5 20 2948 9.244s 
+4 17 401 0.920s
+3 14 80 0.236s

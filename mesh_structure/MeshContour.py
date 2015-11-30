@@ -14,7 +14,7 @@ class MeshContour:
         self.slice_vertices_2 = np.empty(dtype=object, shape=0)
 
     def slice_contour(self, slice_vertices):
-        last_index = slice_vertices.size - 1
+        last_index = len(slice_vertices) - 1
         curr_index = 1
         prev_v = slice_vertices[curr_index - 1]
         curr_v = slice_vertices[curr_index]
@@ -34,6 +34,7 @@ class MeshContour:
                 self.__remove_useless_edges_depending_on_neihbors_direction(prev_v, curr_v, next_v)
                 curr_index = curr_index + 1
 
+        prev_v = slice_vertices[curr_index - 1]
         self.__remove_edges_from_last_vertex(prev_v)
             
         list1, list2 = self.__slice_contour(self.slice_vertices_1, self.slice_vertices_2)
@@ -261,11 +262,11 @@ class MeshContour:
         index_e1 = np.where(self.contour == start_v)[0][0]
         index_e2 = np.where(self.contour == end_v)[0][0]
 
-        edge_list_1 = self.contour[index_e1 + 1:index_e2 - 1]
+        edge_list_1 = self.contour[index_e1 + 1:index_e2]
         edge_list_1 = np.append(edge_list_1, slice_vertices_1[::-1])
 
-        edge_list_2 = self.contour[:index_e1 - 1]
-        edge_list_3 = self.contour[index_e2 + 1:]
+        edge_list_2 = self.contour[:(index_e1)]
+        edge_list_3 = self.contour[(index_e2+1):]
         edge_list_2 = np.append(edge_list_2, slice_vertices_2)
         edge_list_2 = np.append(edge_list_2, edge_list_3)
 

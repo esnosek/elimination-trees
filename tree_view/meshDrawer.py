@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-
+import numpy as np
 
 def draw_mesh_with_cutting_edge(mesh):
     plt.axis([-2, mesh.max_x + 2, -2, mesh.max_y + 2])
@@ -16,7 +16,7 @@ def draw_mesh_with_cutting_edge(mesh):
     plt.show()
 
 def draw_mesh(mesh, depth_level):
-    plt.axis([-2, mesh.max_x + 2, -2, mesh.max_y + 2])
+    plt.axis([-2, 8 + 2, -2, 8 + 2])
     
     if depth_level == 0:
         for key in mesh.edge_list.edge_tree:
@@ -29,8 +29,8 @@ def draw_mesh(mesh, depth_level):
                 if face.level <= depth_level:
                     plt.plot([e.v1.x, e.v2.x], [e.v1.y, e.v2.y], 'k')
 
-def draw_slice_vertices_with_edges(mesh, slice_vertices):
-    plt.axis([-2, 16 + 2, -2, 8 + 2])
+def draw_slice_vertices_with_edges(slice_vertices):
+    plt.axis([-2, 8 + 2, -2, 8 + 2])
     for vertex in slice_vertices:
         for key in vertex.top_edges.edge_incident:
             e = vertex.top_edges.edge_incident[key]
@@ -44,3 +44,16 @@ def draw_slice_vertices_with_edges(mesh, slice_vertices):
         for key in vertex.left_edges.edge_incident:
             e = vertex.left_edges.edge_incident[key]
             plt.plot([e.v1.x, e.v2.x], [e.v1.y, e.v2.y], 'k')
+            
+def draw_contour(vertex_list, colour):
+    plt.axis([-2, 8 + 2, -2, 8 + 2])
+    last_index = len(vertex_list) - 1
+    for vertex in vertex_list:
+        curr_index = np.where(vertex_list == vertex)[0][0]
+        if curr_index == last_index:
+            next_index = 0
+        else:
+            next_index = curr_index + 1
+        v1 = vertex_list[curr_index]
+        v2 = vertex_list[next_index]
+        plt.plot([v1.x, v2.x], [v1.y, v2.y], colour)
