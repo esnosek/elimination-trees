@@ -166,6 +166,7 @@ class CuttingTests(unittest.TestCase):
         
         md.draw_contour(contour1, 'k')
         md.draw_contour(contour2, 'r')
+        md.draw_slice(random_path, 'g')
         
     def test_copy(self):
         return

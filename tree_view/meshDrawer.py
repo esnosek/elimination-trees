@@ -44,7 +44,20 @@ def draw_slice_vertices_with_edges(slice_vertices):
         for key in vertex.left_edges.edge_incident:
             e = vertex.left_edges.edge_incident[key]
             plt.plot([e.v1.x, e.v2.x], [e.v1.y, e.v2.y], 'k')
-            
+ 
+def draw_slice(slice_vertices, colour):
+    plt.axis([-2, 8 + 2, -2, 8 + 2])
+    last_index = len(slice_vertices) - 1
+    curr_index = 0
+    for vertex in slice_vertices:
+        if curr_index == last_index:
+            break
+        next_index = curr_index + 1
+        v1 = slice_vertices[curr_index]
+        v2 = slice_vertices[next_index]
+        plt.plot([v1.x, v2.x], [v1.y, v2.y], colour)
+        curr_index = curr_index + 1
+        
 def draw_contour(vertex_list, colour):
     plt.axis([-2, 8 + 2, -2, 8 + 2])
     last_index = len(vertex_list) - 1
