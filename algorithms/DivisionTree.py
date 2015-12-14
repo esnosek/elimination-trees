@@ -5,9 +5,10 @@ import numpy as np
 from test import create_mesh
 import unittest
 import tree_view.meshDrawer as md
+import sys
 
 class DivisionTree:
-    def __init__(self, initial_contour):
+    def __init__(self):
         self.all_countours = bt.FastRBTree()
     
     def start(self, mesh):
@@ -24,15 +25,26 @@ class DivisionTree:
                 new_contour1, new_contour2 = parent_contour.slice_contour(path)
                 new_node = Node(new_contour1, new_contour2, parent_contour)
                 parent_node.children = np.append(parent_node.children, new_node)
+                for v in parent_contour.contour:
+                    print(v)
+                print(" ")
+                for v in path:
+                    print(v)
+                print(" ")
                 for v in new_contour1.contour:
                     print(v)
                 print(" ")
                 for v in new_contour2.contour:
                     print(v)
                 print(" ")
-                #md.draw_contour(new_contour2.contour, 'k')
-                #md.draw_slice_vertices_with_edges(new_contour1.contour)
-                #md.draw_slice(path, 'g')
+                #if path[0].x == 8 and path[0].y == 8:
+                if path[0].x == 8 and path[0].y == 6:
+                    #md.draw_contour(new_contour2.contour, 'k')
+                    #md.draw_contour(new_contour1.contour, 'r')
+                    md.draw_slice_vertices_with_edges(new_contour1.contour, 'k')
+                    #md.draw_slice_vertices_with_edges(new_contour2.contour, 'r')
+                    #md.draw_slice(path, 'g')
+                    sys.exit("Error message")
                 self.create_tree(new_contour1, new_node)
                 self.create_tree(new_contour2, new_node)
         else:
@@ -52,7 +64,7 @@ class DivisionTreeTests(unittest.TestCase):
  
     def test_cut(self):
         mesh = create_mesh()
-        tree = DivisionTree(mesh.contour)
+        tree = DivisionTree()
         tree.start(mesh)
 
 if __name__ == '__main__':

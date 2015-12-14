@@ -29,21 +29,21 @@ def draw_mesh(mesh, depth_level):
                 if face.level <= depth_level:
                     plt.plot([e.v1.x, e.v2.x], [e.v1.y, e.v2.y], 'k')
 
-def draw_slice_vertices_with_edges(slice_vertices):
+def draw_slice_vertices_with_edges(slice_vertices, colour):
     plt.axis([-2, 16 + 2, -2, 8 + 2])
     for vertex in slice_vertices:
         for key in vertex.top_edges.edge_incident:
             e = vertex.top_edges.edge_incident[key]
-            plt.plot([e.v1.x, e.v2.x], [e.v1.y, e.v2.y], 'k')
+            plt.plot([e.v1.x, e.v2.x], [e.v1.y, e.v2.y], colour)
         for key in vertex.bottom_edges.edge_incident:
             e = vertex.bottom_edges.edge_incident[key]
-            plt.plot([e.v1.x, e.v2.x], [e.v1.y, e.v2.y], 'k')
+            plt.plot([e.v1.x, e.v2.x], [e.v1.y, e.v2.y], colour)
         for key in vertex.right_edges.edge_incident:
             e = vertex.right_edges.edge_incident[key]
-            plt.plot([e.v1.x, e.v2.x], [e.v1.y, e.v2.y], 'k')
+            plt.plot([e.v1.x, e.v2.x], [e.v1.y, e.v2.y], colour)
         for key in vertex.left_edges.edge_incident:
             e = vertex.left_edges.edge_incident[key]
-            plt.plot([e.v1.x, e.v2.x], [e.v1.y, e.v2.y], 'k')
+            plt.plot([e.v1.x, e.v2.x], [e.v1.y, e.v2.y], colour)
  
 def draw_slice(slice_vertices, colour):
     plt.axis([-2, 16 + 2, -2, 8 + 2])
