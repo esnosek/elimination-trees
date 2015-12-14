@@ -38,7 +38,7 @@ class MeshContour:
         self.__remove_edges_from_last_vertex(prev_v)
             
         list1, list2 = self.__slice_contour(self.slice_vertices_1, self.slice_vertices_2)
-        return list1, list2
+        return MeshContour(list1, self.mesh), MeshContour(list2, self.mesh)
 
     def __remove_edges_from_first_vertex(self, next_v):
         self.__remove_edgres_from_first_vertex_from_list_1(next_v)
