@@ -5,6 +5,7 @@ from test import create_mesh
 import unittest
 import random
 import tree_view.meshDrawer as md
+import sys
 # wesja z longest
 
 def get_possible_cuts(contour):
@@ -16,25 +17,34 @@ def get_possible_cuts(contour):
             
            # print(str(point_a), str(point_b))
             #print(point_a.bottom_edges.edge_incident)            
+                    
             
-            inside_direction = None
-            if Direction.left in point_a.get_existing_edge_directions() and Direction.right in point_a.get_existing_edge_directions():
-                if Direction.bottom in point_a.get_existing_edge_directions():
-                    inside_direction = Direction.bottom
-                elif Direction.top in point_a.get_existing_edge_directions():
-                    inside_direction = Direction.top
-            elif Direction.top in point_a.get_existing_edge_directions() and Direction.bottom in point_a.get_existing_edge_directions():
-                if Direction.left in point_a.get_existing_edge_directions():
-                    inside_direction = Direction.left
-                elif Direction.right in point_a.get_existing_edge_directions():
-                    inside_direction = Direction.right
+            inside_directions = []
+            existing_directions =  point_a.get_existing_edge_directions()
+            
+            print("punkt i drogi z niego")
+            print(point_a, existing_directions)
+            for d in existing_directions:
+                edge = point_a.get_longest_edge_in_direction(d)
+                next_point = get_second_edge_point(point_a, edge)
+                if not next_point.is_border_vertex:
+                    #print(d, next_point)
+                    inside_directions.append(d)
+            
+
+            if point_a.x == 4 and point_a.y == 4:
+                print("chuj ci w dupe: " + str(inside_directions))
+            #print("#" * 20)
+            #sys.exit()
+
             #print(point_a, inside_direction, point_a.get_existing_edge_directions())
-            if inside_direction:
-                inside_edge = point_a.get_longest_edge_in_direction(inside_direction)
-                used_cross_points = [point_a]
-                second_point_a = get_second_edge_point(point_a, inside_edge)
-                #try:
-                find_path(second_point_a, [point_b], get_oposite_direction(inside_direction), used_cross_points, possible_paths)
+            if len(inside_directions) > 0:
+                for d in inside_directions:
+                    inside_edge = point_a.get_longest_edge_in_direction(d)
+                    used_cross_points = [point_a]
+                    second_point_a = get_second_edge_point(point_a, inside_edge)
+                    #try:
+                    find_path(second_point_a, [point_b], get_oposite_direction(d), used_cross_points, possible_paths)
                 
                 #except:
                  #   print("ilosc tras " + str(len(possible_paths)))
@@ -60,18 +70,18 @@ def find_path(current_point, end_point_list, arrival_direction, used_cross_point
 
         possible_travel_directions = get_possible_directions(current_point, arrival_direction)
         if len(possible_travel_directions) > 1:
-            cross_points = list(used_cross_points)
-            
-            
-            cross_points.append(current_point)
+            used_cross_points = list(used_cross_points)
+            used_cross_points.append(current_point)
             
         is_current_useful = False
 
         for direction in possible_travel_directions:
+            
             travel_edge = current_point.get_longest_edge_in_direction(direction) # longest
+            #print(current_point, type(travel_edge))
             travel_point = get_second_edge_point(current_point, travel_edge)
 
-            if find_path(travel_point, end_point_list, get_oposite_direction(direction), cross_points, possible_paths):
+            if find_path(travel_point, end_point_list, get_oposite_direction(direction), used_cross_points, possible_paths):
                 is_current_useful = True
 
      

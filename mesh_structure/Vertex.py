@@ -19,15 +19,21 @@ class Vertex:
         self.face_incident_tree = bt.FastRBTree()
         self.is_border_vertex = False
 
+    def change_vertex_in_neighbours(self):
+        self.top_edges.change_vertex(self)
+        self.right_edges.change_vertex(self)
+        self.bottom_edges.change_vertex(self)
+        self.left_edges.change_vertex(self)
+        
     def get_existing_edge_directions(self):
         existing_directions = []
-        if not self.top_edges.is_empty():
+        if not (self.top_edges is None or self.top_edges.is_empty()):
             existing_directions.append(Direction.top)
-        if not self.right_edges.is_empty():
+        if not (self.right_edges is None or self.right_edges.is_empty()):
             existing_directions.append(Direction.right)
-        if not self.bottom_edges.is_empty():
+        if not (self.bottom_edges is None or self.bottom_edges.is_empty()):
             existing_directions.append(Direction.bottom)
-        if not self.left_edges.is_empty():
+        if not (self.left_edges is None or self.left_edges.is_empty()):
             existing_directions.append(Direction.left)
         return existing_directions
 
@@ -87,16 +93,16 @@ class Vertex:
         self.left_edges.add_incident_edge(key, edge)
 
     def remove_top_edges(self):
-        self.top_edges.edge_incident.clear()
+        del self.top_edges
 
     def remove_right_edges(self):
-        self.right_edges.edge_incident.clear()
+        del self.right_edges
 
     def remove_bottom_edges(self):
-        self.bottom_edges.edge_incident.clear()
+        del self.bottom_edges
 
     def remove_left_edges(self):
-        self.left_edges.edge_incident.clear()
+        del self.left_edges
         
     def add_incident_face(self, f):
         key = (f.level, f.id)

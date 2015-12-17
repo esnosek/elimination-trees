@@ -18,10 +18,12 @@ class DivisionTree:
         
     def create_tree(self, parent_contour, parent_node):
         possible_cuts = cu.get_possible_cuts(parent_contour)
+        p = 0
         if parent_contour.contour.size > 4:
-            print("ITERACJA        ", parent_contour.contour.size)
+            print("BUMBUM        ", parent_contour.contour.size)
             print(" ")
             for path in possible_cuts:
+                p = p + 1
                 new_contour1, new_contour2 = parent_contour.slice_contour(path)
                 new_node = Node(new_contour1, new_contour2, parent_contour)
                 parent_node.children = np.append(parent_node.children, new_node)
@@ -38,7 +40,7 @@ class DivisionTree:
                     print(v)
                 print(" ")
                 #if path[0].x == 8 and path[0].y == 8:
-                if path[0].x == 8 and path[0].y == 6:
+                if p == 2:
                     #md.draw_contour(new_contour2.contour, 'k')
                     #md.draw_contour(new_contour1.contour, 'r')
                     md.draw_slice_vertices_with_edges(new_contour1.contour, 'k')
@@ -66,6 +68,7 @@ class DivisionTreeTests(unittest.TestCase):
         mesh = create_mesh()
         tree = DivisionTree()
         tree.start(mesh)
+        
 
 if __name__ == '__main__':
     unittest.main()

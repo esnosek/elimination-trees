@@ -2,6 +2,7 @@
 
 import numpy as np
 from mesh_structure.Direction import Direction
+from copy import copy
 from copy import deepcopy
 import tree_view.meshDrawer as md
 
@@ -18,15 +19,15 @@ class MeshContour:
         curr_index = 1
         prev_v = slice_vertices[curr_index - 1]
         curr_v = slice_vertices[curr_index]
-        self.slice_vertices_1 = np.append(self.slice_vertices_1, deepcopy(prev_v))
-        self.slice_vertices_2 = np.append(self.slice_vertices_2, deepcopy(prev_v))
+        self.slice_vertices_1 = np.append(self.slice_vertices_1, copy(prev_v))
+        self.slice_vertices_2 = np.append(self.slice_vertices_2, copy(prev_v))
         self.__remove_edges_from_first_vertex(curr_v)
         while True:
             prev_v = slice_vertices[curr_index - 1]
             curr_v = slice_vertices[curr_index]
             self.__add_vertices_beetween_two_vertex(prev_v, curr_v)
-            self.slice_vertices_1 = np.append(self.slice_vertices_1, deepcopy(curr_v))
-            self.slice_vertices_2 = np.append(self.slice_vertices_2, deepcopy(curr_v))
+            self.slice_vertices_1 = np.append(self.slice_vertices_1, copy(curr_v))
+            self.slice_vertices_2 = np.append(self.slice_vertices_2, copy(curr_v))
             if curr_index == last_index:
                 break
             else:
@@ -263,11 +264,38 @@ class MeshContour:
         index_e2 = np.where(self.contour == end_v)[0][0]
 
         edge_list_1 = self.contour[index_e1 + 1:index_e2]
+        edge_list_1 = copy(edge_list_1)
+        for v in edge_list_1:
+            v = copy(v)
         edge_list_1 = np.append(edge_list_1, slice_vertices_1[::-1])
-
+            
         edge_list_2 = self.contour[:(index_e1)]
+        edge_list_2 = copy(edge_list_2)
+        for v in edge_list_2:
+            v = copy(v)
+            
         edge_list_3 = self.contour[(index_e2+1):]
+        edge_list_3 = copy(edge_list_3)
+        for v in edge_list_3:
+            v = copy(v)
+            
         edge_list_2 = np.append(edge_list_2, slice_vertices_2)
         edge_list_2 = np.append(edge_list_2, edge_list_3)
 
-        return edge_list_1, edge_list_2
+        
+        for v in edge_list_1:
+            v.is_border_vertex = True
+            v.change_vertex_in_neighbours()  
+        for v in edge_list_2:
+            v.is_border_vertex = True
+            v.change_vertex_in_neighbours()  
+
+        return edge_list_1, edge_list_2      
+        
+        
+        
+        
+        
+        
+        
+        

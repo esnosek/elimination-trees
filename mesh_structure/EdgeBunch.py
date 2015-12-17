@@ -8,7 +8,6 @@ class EdgeBunch:
 
     def __init__(self, direction):
         self.edge_incident = bt.FastRBTree()
-
         self.direction = direction
 
     def add_incident_edge(self, key, e):
@@ -31,3 +30,11 @@ class EdgeBunch:
             return True
         else:
             return False
+
+    def change_vertex(self, vertex):
+        for key in self.edge_incident:
+            edge = self.edge_incident[key]
+            if edge.v1 == vertex:
+                edge.v1 = vertex
+            elif edge.v2 == vertex:
+                edge.v2 = vertex
