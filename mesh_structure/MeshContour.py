@@ -29,14 +29,20 @@ class MeshContour:
     def __len__(self):
         return len(self.contour)
         
-    def get_center(self):
+    def __eq__(self, other):   
+        return True if self.contour_index == other.contour_index else False
         
+    def __str__(self):
+        to_str = ""
+        for v in self.contour:
+            to_str += str(v)
+        
+        return to_str
+        
+    def get_center(self):
         return tuple(map(mean, zip(*self.contour)))
         
     def slice_contour(self, slice_vertices):
-#        for v in slice_vertices:
-#            print(v)
-#        print("")
         self.slice_vertices = np.empty(dtype=object, shape=0)
         last_index = len(slice_vertices) - 1
         curr_index = 1
@@ -53,8 +59,8 @@ class MeshContour:
             else:
                 curr_index = curr_index + 1
             
-        list1, list2 = self.__slice_contour()
-        return MeshContour(list1, self.mesh), MeshContour(list2, self.mesh) 
+        contour1, contour2 = self.__slice_contour()
+        return MeshContour(contour1, self.mesh), MeshContour(contour2, self.mesh) 
                 
     def __add_vertices_beetween_two_vertex(self, v1, v2):
         vector_direction = self.__get_vector_direction(v1, v2)
@@ -206,15 +212,6 @@ class MeshContour:
         countour_part_3 = self.contour[(index_end_v + 1):]
         countour_part_2 = np.append(countour_part_2, self.slice_vertices)
         new_contour_2 = np.append(countour_part_2, countour_part_3)
-#        for v in self.contour:
-#            print(v)
-#        print("*" *20) 
-#        for v in new_contour_1:
-#            print(v)
-#        print("*" *20) 
-#        for v in new_contour_2:
-#            print(v)
-#        print("*" *20) 
         return new_contour_1, new_contour_2      
         
         
