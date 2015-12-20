@@ -2,69 +2,59 @@
 
 import numpy as np
 from mesh_structure.Direction import Direction
-from copy import copy
-from copy import deepcopy
 import tree_view.meshDrawer as md
+from numpy import mean
 
 class MeshContour:
 
     def __init__(self, contour, mesh):
         self.mesh = mesh
         self.contour = contour
-        self.slice_vertices_1 = np.empty(dtype=object, shape=0)
-        self.slice_vertices_2 = np.empty(dtype=object, shape=0)
+        self.contour_index = self.__create_contour_index()
+        self.slice_vertices = np.empty(dtype=object, shape=0)
 
+    def __create_contour_index(self):
+        contour_index = {}
+        for v in self.contour:
+            contour_index[(v.x, v.y)] = v
+        return contour_index
+
+    def __getitem__(self,index):
+        if index == len(self.contour):
+            index = 0
+        elif index == -1:
+            index = len(self.contour) - 1
+        return self.contour[index]
+
+    def __len__(self):
+        return len(self.contour)
+        
+    def get_center(self):
+        
+        return tuple(map(mean, zip(*self.contour)))
+        
     def slice_contour(self, slice_vertices):
+#        for v in slice_vertices:
+#            print(v)
+#        print("")
+        self.slice_vertices = np.empty(dtype=object, shape=0)
         last_index = len(slice_vertices) - 1
         curr_index = 1
         prev_v = slice_vertices[curr_index - 1]
         curr_v = slice_vertices[curr_index]
-        self.slice_vertices_1 = np.append(self.slice_vertices_1, copy(prev_v))
-        self.slice_vertices_2 = np.append(self.slice_vertices_2, copy(prev_v))
-        self.__remove_edges_from_first_vertex(curr_v)
+        self.slice_vertices = np.append(self.slice_vertices, prev_v)
         while True:
             prev_v = slice_vertices[curr_index - 1]
             curr_v = slice_vertices[curr_index]
             self.__add_vertices_beetween_two_vertex(prev_v, curr_v)
-            self.slice_vertices_1 = np.append(self.slice_vertices_1, copy(curr_v))
-            self.slice_vertices_2 = np.append(self.slice_vertices_2, copy(curr_v))
+            self.slice_vertices = np.append(self.slice_vertices, curr_v)
             if curr_index == last_index:
                 break
             else:
-                next_v = slice_vertices[curr_index + 1]
-                self.__remove_useless_edges_depending_on_neihbors_direction(prev_v, curr_v, next_v)
                 curr_index = curr_index + 1
-
-        prev_v = slice_vertices[curr_index - 1]
-        self.__remove_edges_from_last_vertex(prev_v)
             
-        list1, list2 = self.__slice_contour(self.slice_vertices_1, self.slice_vertices_2)
-        return MeshContour(list1, self.mesh), MeshContour(list2, self.mesh)
-
-    def __remove_edges_from_first_vertex(self, next_v):
-        self.__remove_edgres_from_first_vertex_from_list_1(next_v)
-        self.__remove_edgres_from_first_vertex_from_list_2(next_v)  
-
-    def __remove_edgres_from_first_vertex_from_list_1(self, next_v):
-        curr_v_index = np.where(self.contour == self.slice_vertices_1[0])[0][0]
-        if curr_v_index == self.contour.size - 1:
-            prev_v_index = 0
-        else:
-            prev_v_index = curr_v_index + 1
-        prev_v = self.contour[prev_v_index]
-        curr_v = self.contour[curr_v_index]
-        self.__remove_useless_edges_depending_on_neihbors_direction(prev_v, curr_v, next_v)
-        
-    def __remove_edgres_from_first_vertex_from_list_2(self, next_v):
-        curr_v_index = np.where(self.contour == self.slice_vertices_2[0])[0][0]
-        if curr_v_index == 0:
-            prev_v_index = self.contour.size - 1
-        else:
-            prev_v_index = curr_v_index - 1
-        prev_v = self.contour[prev_v_index]
-        curr_v = self.contour[curr_v_index]
-        self.__remove_useless_edges_depending_on_neihbors_direction(prev_v, curr_v, next_v)
-        
+        list1, list2 = self.__slice_contour()
+        return MeshContour(list1, self.mesh), MeshContour(list2, self.mesh) 
                 
     def __add_vertices_beetween_two_vertex(self, v1, v2):
         vector_direction = self.__get_vector_direction(v1, v2)
@@ -113,10 +103,7 @@ class MeshContour:
         for key in vertices_beetween:
             vertex = vertices_beetween[key]
             if vertex != v1 and vertex != v2:
-                if not vertex.left_edges.is_empty():
-                    self.slice_vertices_1 = np.append(self.slice_vertices_1,  vertex)
-                if not vertex.right_edges.is_empty():
-                    self.slice_vertices_2 = np.append(self.slice_vertices_2, vertex)
+                self.slice_vertices = np.append(self.slice_vertices,  vertex)
 
     def __add_vertices_from_right_directed_vector(self, v1, v2):
         # krawedz skierowana w prawo, wiec v1 < v2
@@ -124,173 +111,111 @@ class MeshContour:
         for key in vertices_beetween:
             vertex = vertices_beetween[key]
             if vertex != v1 and vertex != v2:
-                if not vertex.top_edges.is_empty():
-                    self.slice_vertices_1 = np.append(self.slice_vertices_1,  vertex)
-                if not vertex.bottom_edges.is_empty():
-                    self.slice_vertices_2 = np.append(self.slice_vertices_2, vertex)
+                self.slice_vertices = np.append(self.slice_vertices,  vertex)
 
     def __add_vertices_from_bottom_directed_vector(self, v1, v2):
         # krawedz skierowana w dół, wiec v1 > v2
         vertices_beetween = self.mesh.vertex_list.vertex_tree[(v2.x, v2.y):(v1.x, v1.y)]
-        size_of_slice_vertices_1 = self.slice_vertices_1.size
-        size_of_slice_vertices_2 = self.slice_vertices_2.size
+        size_of_slice_vertices = self.slice_vertices.size
         for key in vertices_beetween:
             vertex = vertices_beetween[key]
             if vertex != v1 and vertex != v2:
-                if not vertex.right_edges.is_empty():
-                    self.slice_vertices_1 = np.insert(self.slice_vertices_1, size_of_slice_vertices_1, vertex)
-                if not vertex.left_edges.is_empty():
-                    self.slice_vertices_2 = np.insert(self.slice_vertices_2, size_of_slice_vertices_2, vertex)
+                self.slice_vertices = np.insert(self.slice_vertices, size_of_slice_vertices, vertex)
 
     def __add_vertices_from_left_directed_vector(self, v1, v2):
         # krawedz skierowana w lewo, wiec v1 > v2
         vertices_beetween = self.mesh.vertex_list.vertex_tree_y_sorted[(v2.y, v2.x):(v1.y, v1.x)]
-        size_of_slice_vertices_1 = self.slice_vertices_1.size
-        size_of_slice_vertices_2 = self.slice_vertices_2.size
+        size_of_slice_vertices = self.slice_vertices.size
         for key in vertices_beetween:
             vertex = vertices_beetween[key]
             if vertex != v1 and vertex != v2:
-                if not vertex.bottom_edges.is_empty():
-                    self.slice_vertices_1 = np.insert(self.slice_vertices_1, size_of_slice_vertices_1, vertex)
-                if not vertex.top_edges.is_empty():
-                    self.slice_vertices_2 = np.insert(self.slice_vertices_2, size_of_slice_vertices_2, vertex)
+                self.slice_vertices = np.insert(self.slice_vertices, size_of_slice_vertices, vertex)
 
-    def __remove_useless_edges_depending_on_neihbors_direction(self, prev_v, curr_v, next_v):
+    def get_inside_directions(self, prev_v, curr_v, next_v):
         dir1 = self.__get_vector_direction(prev_v, curr_v)
         dir2 = self.__get_vector_direction(curr_v, next_v)
-        v_from_list_1 = self.slice_vertices_1[self.slice_vertices_1.size - 1]
-        v_from_list_2 = self.slice_vertices_2[self.slice_vertices_2.size - 1]
         if dir1 == Direction.top and dir2 == Direction.top:
-            self.__remove_edges_from_vertex_beetwen_top_and_top_vectors(v_from_list_1, v_from_list_2)
+            return self.__get_inside_directions_from_vertex_beetwen_top_and_top_vectors()
         if dir1 == Direction.top and dir2 == Direction.right:
-            self.__remove_edges_from_vertex_beetwen_top_and_right_vectors(v_from_list_1, v_from_list_2)
+            return self.__get_inside_directions_from_vertex_beetwen_top_and_right_vectors()
         if dir1 == Direction.top and dir2 == Direction.left:
-            self.__remove_edges_from_vertex_beetwen_top_and_left_vectors(v_from_list_1, v_from_list_2)
+            return self.__get_inside_directions_from_vertex_beetwen_top_and_left_vectors()
         if dir1 == Direction.right and dir2 == Direction.top:
-            self.__remove_edges_from_vertex_beetwen_right_and_top_vectors(v_from_list_1, v_from_list_2)
+            return self.__get_inside_directions_from_vertex_beetwen_right_and_top_vectors()
         if dir1 == Direction.right and dir2 == Direction.right:
-            self.__remove_edges_from_vertex_beetwen_right_and_right_vectors(v_from_list_1, v_from_list_2)
+            return self.__get_inside_directions_from_vertex_beetwen_right_and_right_vectors()
         if dir1 == Direction.right and dir2 == Direction.bottom:
-            self.__remove_edges_from_vertex_beetwen_right_and_bottom_vectors(v_from_list_1, v_from_list_2)
+            return self.__get_inside_directions_from_vertex_beetwen_right_and_bottom_vectors()
         if dir1 == Direction.bottom and dir2 == Direction.right:
-            self.__remove_edges_from_vertex_beetwen_bottom_and_right_vectors(v_from_list_1, v_from_list_2)
+            return self.__get_inside_directions_from_vertex_beetwen_bottom_and_right_vectors()
         if dir1 == Direction.bottom and dir2 == Direction.bottom:
-            self.__remove_edges_from_vertex_beetwen_bottom_and_bottom_vectors(v_from_list_1, v_from_list_2)
+            return self.__get_inside_directions_from_vertex_beetwen_bottom_and_bottom_vectors()
         if dir1 == Direction.bottom and dir2 == Direction.left:
-            self.__remove_edges_from_vertex_beetwen_bottom_and_left_vectors(v_from_list_1, v_from_list_2)
+            return self.__get_inside_directions_from_vertex_beetwen_bottom_and_left_vectors()
         if dir1 == Direction.left and dir2 == Direction.top:
-            self.__remove_edges_from_vertex_beetwen_left_and_top_vectors(v_from_list_1, v_from_list_2)
+            return self.__get_inside_directions_from_vertex_beetwen_left_and_top_vectors()
         if dir1 == Direction.left and dir2 == Direction.bottom:
-            self.__remove_edges_from_vertex_beetwen_left_and_bottom_vectors(v_from_list_1, v_from_list_2)
+            return self.__get_inside_directions_from_vertex_beetwen_left_and_bottom_vectors()
         if dir1 == Direction.left and dir2 == Direction.left:
-            self.__remove_edges_from_vertex_beetwen_left_and_left_vectors(v_from_list_1, v_from_list_2)
+            return self.__get_inside_directions_from_vertex_beetwen_left_and_left_vectors()
 
-    def __remove_edges_from_vertex_beetwen_top_and_top_vectors(self, v1, v2):
-        v1.remove_right_edges()
-        v2.remove_left_edges()
+    def __get_inside_directions_from_vertex_beetwen_top_and_top_vectors(self):
+        return [Direction.right]
 
-    def __remove_edges_from_vertex_beetwen_top_and_right_vectors(self, v1, v2):
-        v2.remove_top_edges()
-        v2.remove_left_edges()
+    def __get_inside_directions_from_vertex_beetwen_top_and_right_vectors(self):
+        return []
 
-    def __remove_edges_from_vertex_beetwen_top_and_left_vectors(self, v1, v2):
-        v1.remove_top_edges()
-        v1.remove_right_edges()
+    def __get_inside_directions_from_vertex_beetwen_top_and_left_vectors(self):
+        return [Direction.top, Direction.right]
 
-    def __remove_edges_from_vertex_beetwen_right_and_top_vectors(self, v1, v2):
-        v1.remove_bottom_edges()
-        v1.remove_right_edges()
+    def __get_inside_directions_from_vertex_beetwen_right_and_top_vectors(self):
+        return [Direction.bottom, Direction.right]
 
-    def __remove_edges_from_vertex_beetwen_right_and_right_vectors(self, v1, v2):
-        v1.remove_bottom_edges()
-        v2.remove_top_edges()
+    def __get_inside_directions_from_vertex_beetwen_right_and_right_vectors(self):
+        return [Direction.bottom]
 
-    def __remove_edges_from_vertex_beetwen_right_and_bottom_vectors(self, v1, v2):
-        v2.remove_top_edges()
-        v2.remove_right_edges()
+    def __get_inside_directions_from_vertex_beetwen_right_and_bottom_vectors(self):
+        return []
 
-    def __remove_edges_from_vertex_beetwen_bottom_and_right_vectors(self, v1, v2):
-        v1.remove_bottom_edges()
-        v1.remove_left_edges()
+    def __get_inside_directions_from_vertex_beetwen_bottom_and_right_vectors(self):
+        return [Direction.bottom, Direction.left]
 
-    def __remove_edges_from_vertex_beetwen_bottom_and_bottom_vectors(self, v1, v2):
-        v1.remove_left_edges()
-        v2.remove_right_edges()
+    def __get_inside_directions_from_vertex_beetwen_bottom_and_bottom_vectors(self):
+        return [Direction.left]
 
-    def __remove_edges_from_vertex_beetwen_bottom_and_left_vectors(self, v1, v2):
-        v2.remove_bottom_edges()
-        v2.remove_right_edges()
+    def __get_inside_directions_from_vertex_beetwen_bottom_and_left_vectors(self):
+        return []
 
-    def __remove_edges_from_vertex_beetwen_left_and_top_vectors(self, v1, v2):
-        v2.remove_bottom_edges()
-        v2.remove_left_edges()
+    def __get_inside_directions_from_vertex_beetwen_left_and_top_vectors(self):
+        return []
 
-    def __remove_edges_from_vertex_beetwen_left_and_bottom_vectors(self, v1, v2):
-        v1.remove_top_edges()
-        v1.remove_left_edges()
+    def __get_inside_directions_from_vertex_beetwen_left_and_bottom_vectors(self):
+        return [Direction.top, Direction.left]
 
-    def __remove_edges_from_vertex_beetwen_left_and_left_vectors(self, v1, v2):
-        v1.remove_top_edges()
-        v2.remove_bottom_edges()
-
-    def __remove_edges_from_last_vertex(self, prev_v):
-        self.__remove_edgres_from_last_vertex_from_list_1(prev_v)
-        self.__remove_edgres_from_last_vertex_from_list_2(prev_v)  
-
-    def __remove_edgres_from_last_vertex_from_list_1(self, prev_v):
-        curr_v_index = np.where(self.contour == self.slice_vertices_1[self.slice_vertices_1.size - 1])[0][0]
-        if curr_v_index == 0:
-            next_v_index = self.contour.size - 1
-        else:
-            next_v_index = curr_v_index - 1
-        next_v = self.contour[next_v_index]
-        curr_v = self.contour[curr_v_index]
-        self.__remove_useless_edges_depending_on_neihbors_direction(prev_v, curr_v, next_v)
-
-    def __remove_edgres_from_last_vertex_from_list_2(self, prev_v):
-        curr_v_index = np.where(self.contour == self.slice_vertices_2[self.slice_vertices_2.size - 1])[0][0]
-        if curr_v_index == self.contour.size - 1:
-            next_v_index = 0
-        else:
-            next_v_index = curr_v_index + 1
-        next_v = self.contour[next_v_index]
-        curr_v = self.contour[curr_v_index]
-        self.__remove_useless_edges_depending_on_neihbors_direction(prev_v, curr_v, next_v)
+    def __get_inside_directions_from_vertex_beetwen_left_and_left_vectors(self):
+        return [Direction.top]
     
-    def __slice_contour(self, slice_vertices_1, slice_vertices_2):
-        start_v = slice_vertices_1[0]
-        end_v = slice_vertices_1[slice_vertices_1.size - 1]
-        index_e1 = np.where(self.contour == start_v)[0][0]
-        index_e2 = np.where(self.contour == end_v)[0][0]
-
-        edge_list_1 = self.contour[index_e1 + 1:index_e2]
-        edge_list_1 = copy(edge_list_1)
-        for v in edge_list_1:
-            v = copy(v)
-        edge_list_1 = np.append(edge_list_1, slice_vertices_1[::-1])
-            
-        edge_list_2 = self.contour[:(index_e1)]
-        edge_list_2 = copy(edge_list_2)
-        for v in edge_list_2:
-            v = copy(v)
-            
-        edge_list_3 = self.contour[(index_e2+1):]
-        edge_list_3 = copy(edge_list_3)
-        for v in edge_list_3:
-            v = copy(v)
-            
-        edge_list_2 = np.append(edge_list_2, slice_vertices_2)
-        edge_list_2 = np.append(edge_list_2, edge_list_3)
-
-        
-        for v in edge_list_1:
-            v.is_border_vertex = True
-            v.change_vertex_in_neighbours()  
-        for v in edge_list_2:
-            v.is_border_vertex = True
-            v.change_vertex_in_neighbours()  
-
-        return edge_list_1, edge_list_2      
+    def __slice_contour(self):
+        start_v = self.slice_vertices[0]
+        end_v = self.slice_vertices[self.slice_vertices.size - 1]
+        index_start_v = np.where(self.contour == start_v)[0][0]
+        index_end_v = np.where(self.contour == end_v)[0][0]
+        countour_part_1 = self.contour[index_start_v + 1:index_end_v]
+        new_contour_1 = np.append(countour_part_1, self.slice_vertices[::-1])
+        countour_part_2 = self.contour[:(index_start_v)]
+        countour_part_3 = self.contour[(index_end_v + 1):]
+        countour_part_2 = np.append(countour_part_2, self.slice_vertices)
+        new_contour_2 = np.append(countour_part_2, countour_part_3)
+#        for v in self.contour:
+#            print(v)
+#        print("*" *20) 
+#        for v in new_contour_1:
+#            print(v)
+#        print("*" *20) 
+#        for v in new_contour_2:
+#            print(v)
+#        print("*" *20) 
+        return new_contour_1, new_contour_2      
         
         
         

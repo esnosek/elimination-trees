@@ -5,7 +5,6 @@ from mesh_structure.VertexList import VertexList
 from mesh_structure.EdgeList import EdgeList
 from mesh_structure.FaceList import FaceList
 from mesh_structure.Mesh import Mesh
-from copy import copy
 
 def load_file(path):
     return np.loadtxt(path, dtype='int', skiprows=2)
@@ -82,7 +81,20 @@ def test_slice(mesh):
     slice_vertices2 = np.empty(dtype=object, shape=0)
     slice_vertices2 = np.append(slice_vertices2, v21)
     slice_vertices2 = np.append(slice_vertices2, v22)
-    mesh.contour.slice_contour(slice_vertices)
+    contour1, contour2 = mesh.contour.slice_contour(slice_vertices)
+    print(contour1[len(contour1)])    
+    
+    for v in contour1.contour:
+        print(v)
+#    print("-" *20)
+#    for v in contour1.contour_index:
+#        print(v)
+#    print("#" *20)
+#    for v in contour2.contour:
+#        print(v)
+#    print("-" *20)
+#    for v in contour2.contour_index:
+#        print(v)
 
 
 def slice_contour(self, start_v, end_v, slice_edges):

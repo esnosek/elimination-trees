@@ -17,14 +17,7 @@ class Vertex:
         self.bottom_edges = EdgeBunch(Direction.bottom)
         self.left_edges = EdgeBunch(Direction.left)
         self.face_incident_tree = bt.FastRBTree()
-        self.is_border_vertex = False
 
-    def change_vertex_in_neighbours(self):
-        self.top_edges.change_vertex(self)
-        self.right_edges.change_vertex(self)
-        self.bottom_edges.change_vertex(self)
-        self.left_edges.change_vertex(self)
-        
     def get_existing_edge_directions(self):
         existing_directions = []
         if not (self.top_edges is None or self.top_edges.is_empty()):

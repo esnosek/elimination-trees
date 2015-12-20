@@ -15,59 +15,43 @@ def get_possible_cuts(contour):
             point_a = contour.contour[point_a_idx]
             point_b = contour.contour[point_b_idx]
             
-           # print(str(point_a), str(point_b))
-            #print(point_a.bottom_edges.edge_incident)            
-                    
-            
-            inside_directions = []
-            existing_directions =  point_a.get_existing_edge_directions()
-            
-            print("punkt i drogi z niego")
-            print(point_a, existing_directions)
-            for d in existing_directions:
-                edge = point_a.get_longest_edge_in_direction(d)
-                next_point = get_second_edge_point(point_a, edge)
-                if not next_point.is_border_vertex:
-                    #print(d, next_point)
-                    inside_directions.append(d)
-            
+            inside_directions =  contour.get_inside_directions(contour[point_a_idx - 1], 
+                                                                 point_a, 
+                                                                 contour[point_a_idx + 1])
 
-            if point_a.x == 4 and point_a.y == 4:
-                print("chuj ci w dupe: " + str(inside_directions))
-            #print("#" * 20)
-            #sys.exit()
-
-            #print(point_a, inside_direction, point_a.get_existing_edge_directions())
+            existing_directions = point_a.get_existing_edge_directions()
+#            print(point_a)
+#            print(point_b)
+#            print(existing_directions)
+#            print(inside_directions)
+#            print(" ")
+            possible_directions = list(set(inside_directions).intersection(existing_directions))
             if len(inside_directions) > 0:
-                for d in inside_directions:
+                for d in possible_directions:
                     inside_edge = point_a.get_longest_edge_in_direction(d)
                     used_cross_points = [point_a]
                     second_point_a = get_second_edge_point(point_a, inside_edge)
-                    #try:
-                    find_path(second_point_a, [point_b], get_oposite_direction(d), used_cross_points, possible_paths)
-                
-                #except:
-                 #   print("ilosc tras " + str(len(possible_paths)))
+
+                    find_path(second_point_a, [point_b], get_oposite_direction(d), used_cross_points, possible_paths, contour.contour_index)
+
                 
     return possible_paths
 
 
-def find_path(current_point, end_point_list, arrival_direction, used_cross_points, possible_paths):
-    #print("ilosc tras " + str(len(possible_paths)))
+def find_path(current_point, end_point_list, arrival_direction, used_cross_points, possible_paths, contour_index):
+
     if current_point in end_point_list:
         
         used_cross_points.append(current_point)
         
         possible_paths.append(used_cross_points)
         
-        #print(used_cross_points[-1].get_existing_edge_directions())
         return True
-    elif current_point in used_cross_points or current_point.is_border_vertex:
-
+    elif current_point in used_cross_points or (current_point.x, current_point.y) in contour_index:
         return False
 
-    elif is_there_any_way(current_point, arrival_direction):
-
+    elif is_there_any_way(current_point, arrival_direction, contour_index):
+        
         possible_travel_directions = get_possible_directions(current_point, arrival_direction)
         if len(possible_travel_directions) > 1:
             used_cross_points = list(used_cross_points)
@@ -78,10 +62,10 @@ def find_path(current_point, end_point_list, arrival_direction, used_cross_point
         for direction in possible_travel_directions:
             
             travel_edge = current_point.get_longest_edge_in_direction(direction) # longest
-            #print(current_point, type(travel_edge))
+
             travel_point = get_second_edge_point(current_point, travel_edge)
 
-            if find_path(travel_point, end_point_list, get_oposite_direction(direction), used_cross_points, possible_paths):
+            if find_path(travel_point, end_point_list, get_oposite_direction(direction), used_cross_points, possible_paths, contour_index):
                 is_current_useful = True
 
      
@@ -126,11 +110,14 @@ def get_possible_directions(point, arrival_direction):
         possible_directions.remove(arrival_direction)
     return possible_directions
 
-def is_there_any_way(point, arrival_direction):
-    if point.is_border_vertex:
-         return False
-    if get_oposite_direction(arrival_direction) in point.get_existing_edge_directions():
-         return True
+def is_there_any_way(point, arrival_direction, contour_index):
+    if (point.x, point.y) in contour_index:
+        return False
+    elif get_oposite_direction(arrival_direction) in point.get_existing_edge_directions():
+        return True
+    else:
+        return False
+        
 
 
 class CuttingTests(unittest.TestCase):

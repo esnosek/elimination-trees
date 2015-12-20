@@ -20,6 +20,8 @@ mesh = create_mesh(fileName)
 #print([str(e) for e in mesh.contour.contour])
 #print(mesh.vertex_list.vertex_tree)
 
+#ln.test_slice(mesh)
+
 end_time = int(round(time.time() * 100000))
 print('czas: ' + str((end_time - start_time)/100000) + 's')
 
