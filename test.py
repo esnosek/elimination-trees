@@ -2,7 +2,7 @@ import mesh_structure.list_numpy as ln
 import time
 import tree_view.meshDrawer as md
 
-fileName = "mesh_tests/test1.txt"
+fileName = "mesh_tests/test_corner.txt"
 
 
 def create_mesh(fileName=fileName):
@@ -26,4 +26,4 @@ end_time = int(round(time.time() * 100000))
 print('czas: ' + str((end_time - start_time)/100000) + 's')
 
 #md.draw_mesh_with_cutting_edge(mesh)
-#md.draw_mesh(mesh, 7)
+md.draw_mesh(mesh, 9)

@@ -14,10 +14,14 @@ def get_possible_cuts(contour):
             point_a = contour.contour[point_a_idx]
             point_b = contour.contour[point_b_idx]
             
-            inside_directions =  contour.get_inside_directions(contour[point_a_idx - 1], point_a, contour[point_a_idx + 1])
+            inside_directions =  contour.get_inside_directions(contour[point_a_idx - 1],
+                                                               point_a, 
+                                                               contour[point_a_idx + 1])
 
             existing_directions = point_a.get_existing_edge_directions()
+            
             possible_directions = list(set(inside_directions).intersection(existing_directions))
+            
             if len(inside_directions) > 0:
                 for d in possible_directions:
                     inside_edge = point_a.get_longest_edge_in_direction(d)

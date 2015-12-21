@@ -4,6 +4,9 @@ import numpy as np
 from mesh_structure.Direction import Direction
 import tree_view.meshDrawer as md
 from numpy import mean
+import sys
+
+licznik_chujowek = 1
 
 class MeshContour:
 
@@ -12,6 +15,8 @@ class MeshContour:
         self.contour = contour
         self.contour_index = self.__create_contour_index()
         self.slice_vertices = np.empty(dtype=object, shape=0)
+        self.center = tuple(np.average(np.array(list(self.contour_index.keys())).astype(int), axis=0))
+        #print(type(self.center))
 
     def __create_contour_index(self):
         contour_index = {}
@@ -52,26 +57,27 @@ class MeshContour:
         while True:
             prev_v = slice_vertices[curr_index - 1]
             curr_v = slice_vertices[curr_index]
-            self.__add_vertices_beetween_two_vertex(prev_v, curr_v)
+            self.slice_vertices = self.__add_vertices_beetween_two_vertex(self.slice_vertices, prev_v, curr_v)
             self.slice_vertices = np.append(self.slice_vertices, curr_v)
             if curr_index == last_index:
                 break
             else:
                 curr_index = curr_index + 1
-            
+        
         contour1, contour2 = self.__slice_contour()
         return MeshContour(contour1, self.mesh), MeshContour(contour2, self.mesh) 
                 
-    def __add_vertices_beetween_two_vertex(self, v1, v2):
+    def __add_vertices_beetween_two_vertex(self, list, v1, v2):
         vector_direction = self.__get_vector_direction(v1, v2)
         if vector_direction == Direction.top:
-            self.__add_vertices_from_top_directed_vector(v1, v2)
+            list = self.__add_vertices_from_top_directed_vector(list, v1, v2)
         if vector_direction == Direction.right:
-            self.__add_vertices_from_right_directed_vector(v1, v2)
+            list = self.__add_vertices_from_right_directed_vector(list, v1, v2)
         if vector_direction == Direction.bottom:
-            self.__add_vertices_from_bottom_directed_vector(v1, v2)
+            list = self.__add_vertices_from_bottom_directed_vector(list, v1, v2)
         if vector_direction == Direction.left:
-            self.__add_vertices_from_left_directed_vector(v1, v2)
+            list = self.__add_vertices_from_left_directed_vector(list, v1, v2)
+        return list
 
     def __get_vector_direction(self, v1, v2):
         if self.__is_direction_top(v1, v2):
@@ -103,41 +109,47 @@ class MeshContour:
             return True
         return False
 
-    def __add_vertices_from_top_directed_vector(self, v1, v2):
+    def __add_vertices_from_top_directed_vector(self, list, v1, v2):
         # krawedz skierowana w gore, wiec v1 < v2
         vertices_beetween = self.mesh.vertex_list.vertex_tree[(v1.x, v1.y):(v2.x, v2.y)]
         for key in vertices_beetween:
             vertex = vertices_beetween[key]
             if vertex != v1 and vertex != v2:
-                self.slice_vertices = np.append(self.slice_vertices,  vertex)
+                list = np.append(list,  vertex)
+        return list
 
-    def __add_vertices_from_right_directed_vector(self, v1, v2):
+    def __add_vertices_from_right_directed_vector(self, list, v1, v2):
         # krawedz skierowana w prawo, wiec v1 < v2
         vertices_beetween = self.mesh.vertex_list.vertex_tree_y_sorted[(v1.y, v1.x):(v2.y, v2.x)]
         for key in vertices_beetween:
             vertex = vertices_beetween[key]
             if vertex != v1 and vertex != v2:
-                self.slice_vertices = np.append(self.slice_vertices,  vertex)
+                list = np.append(list,  vertex)
+        return list
 
-    def __add_vertices_from_bottom_directed_vector(self, v1, v2):
+    def __add_vertices_from_bottom_directed_vector(self, list, v1, v2):
         # krawedz skierowana w dół, wiec v1 > v2
         vertices_beetween = self.mesh.vertex_list.vertex_tree[(v2.x, v2.y):(v1.x, v1.y)]
-        size_of_slice_vertices = self.slice_vertices.size
+        size_of_slice_vertices = list.size
         for key in vertices_beetween:
             vertex = vertices_beetween[key]
             if vertex != v1 and vertex != v2:
-                self.slice_vertices = np.insert(self.slice_vertices, size_of_slice_vertices, vertex)
+                list = np.insert(list, size_of_slice_vertices, vertex)
+        return list
 
-    def __add_vertices_from_left_directed_vector(self, v1, v2):
+    def __add_vertices_from_left_directed_vector(self, list, v1, v2):
         # krawedz skierowana w lewo, wiec v1 > v2
         vertices_beetween = self.mesh.vertex_list.vertex_tree_y_sorted[(v2.y, v2.x):(v1.y, v1.x)]
-        size_of_slice_vertices = self.slice_vertices.size
+        size_of_slice_vertices = list.size
         for key in vertices_beetween:
             vertex = vertices_beetween[key]
             if vertex != v1 and vertex != v2:
-                self.slice_vertices = np.insert(self.slice_vertices, size_of_slice_vertices, vertex)
+                list = np.insert(list, size_of_slice_vertices, vertex)
+        return list
 
     def get_inside_directions(self, prev_v, curr_v, next_v):
+        global licznik_chujowek
+        
         dir1 = self.__get_vector_direction(prev_v, curr_v)
         dir2 = self.__get_vector_direction(curr_v, next_v)
         if dir1 == Direction.top and dir2 == Direction.top:
@@ -164,6 +176,18 @@ class MeshContour:
             return self.__get_inside_directions_from_vertex_beetwen_left_and_bottom_vectors()
         if dir1 == Direction.left and dir2 == Direction.left:
             return self.__get_inside_directions_from_vertex_beetwen_left_and_left_vectors()
+
+        print("trzy kolejne punkty")
+        print(prev_v, curr_v, next_v)
+        print("kontur")
+        print([str(v) for v in self.contour])
+        print("#" * 50)
+        
+        licznik_chujowek += 1
+        if licznik_chujowek > 100:
+            sys.exit()
+       
+        return []
 
     def __get_inside_directions_from_vertex_beetwen_top_and_top_vectors(self):
         return [Direction.right]
@@ -212,6 +236,14 @@ class MeshContour:
         countour_part_3 = self.contour[(index_end_v + 1):]
         countour_part_2 = np.append(countour_part_2, self.slice_vertices)
         new_contour_2 = np.append(countour_part_2, countour_part_3)
+
+        first_vertex_1 = new_contour_1[0]        
+        last_vertex_1 = new_contour_1[len(new_contour_1) - 1]
+        first_vertex_2 = new_contour_2[0]        
+        last_vertex_2 = new_contour_2[len(new_contour_2) - 1]
+        new_contour_1 = self.__add_vertices_beetween_two_vertex(new_contour_1, first_vertex_1, last_vertex_1)
+        new_contour_2 = self.__add_vertices_beetween_two_vertex(new_contour_2, first_vertex_2, last_vertex_2)
+
         return new_contour_1, new_contour_2      
         
         

@@ -2,28 +2,55 @@
 import algorithms.CuttingUtils as cu
 import numpy as np
 from test import create_mesh
+import bintrees as bt
 import unittest
+import tree_view.meshDrawer as md
 
-all_countours = np.empty(dtype=object, shape=0)
+all_countours = bt.FastRBTree()
 counter = 0
+all_contour_counter = 1
 
 
 def start(mesh):
     global all_countours
     root = ContourNode(mesh.contour, None)
-    all_countours = np.append(all_countours, root)
+    all_countours[hash(root.contour.center)] = [root]
+    
     root.generate_all_children_division_nodes()
 
 
 def create_tree(parent_contour_node, parent_division_node):
     global all_countours
-    if parent_contour_node in all_countours:
-        existing_contour_node_index = np.where(all_countours == parent_contour_node)[0][0]
-        existing_contour_node = all_countours[existing_contour_node_index]
+    global all_contour_counter
+    
+    if is_in_all_contours(parent_contour_node):
+        existing_contour_node = get_from_all_contours(parent_contour_node)
         existing_contour_node.add_parent_division(parent_division_node)
     else:
-        all_countours = np.append(all_countours, parent_contour_node)
+        all_contour_counter += 1
+        perent_hash = hash(parent_contour_node.contour.center)
+        if perent_hash in all_countours:
+            all_countours[perent_hash].append(parent_contour_node)
+        else:
+            all_countours[perent_hash] = [parent_contour_node]
+            
         parent_contour_node.generate_all_children_division_nodes()
+        
+def is_in_all_contours(contour_node):
+    contour_hash_key = hash(contour_node.contour.center)
+    if contour_hash_key in all_countours:
+        for c in all_countours[contour_hash_key]:
+            if c == contour_node:
+                return True
+    return False
+    
+def get_from_all_contours(contour_node):
+    contour_hash_key = hash(contour_node.contour.center)
+    if contour_hash_key in all_countours:
+        for c in all_countours[contour_hash_key]:
+            if c == contour_node:
+                return c
+    return False
 
 
 class ContourNode:
@@ -85,6 +112,8 @@ class DivisionTreeTests(unittest.TestCase):
         global all_countours
         mesh = create_mesh()
         start(mesh)
+        print(len(all_countours))
+        print(all_contour_counter)
 
 if __name__ == '__main__':
     unittest.main()

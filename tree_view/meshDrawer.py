@@ -16,7 +16,7 @@ def draw_mesh_with_cutting_edge(mesh):
     plt.show()
 
 def draw_mesh(mesh, depth_level):
-    plt.axis([-2, 16 + 2, -2, 8 + 2])
+    plt.axis([-2, 2048 + 2, -2, 2048 + 2])
     
     if depth_level == 0:
         for key in mesh.edge_list.edge_tree:
