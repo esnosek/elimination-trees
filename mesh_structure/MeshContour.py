@@ -11,10 +11,14 @@ licznik_chujowek = 1
 class MeshContour:
 
     def __init__(self, contour, mesh):
+        if type(self.__is_atomic_square(contour)) is int:
+            print("kontur")
+            print([str(v) for v in contour])        
+            print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+            sys.exit()
         self.mesh = mesh
         self.contour = contour
         self.contour_index = self.__create_contour_index()
-        self.slice_vertices = np.empty(dtype=object, shape=0)
         self.center = tuple(np.average(np.array(list(self.contour_index.keys())).astype(int), axis=0))
         #print(type(self.center))
 
@@ -48,23 +52,23 @@ class MeshContour:
         return tuple(map(mean, zip(*self.contour)))
         
     def slice_contour(self, slice_vertices):
-        self.slice_vertices = np.empty(dtype=object, shape=0)
+        new_slice_vertices = np.empty(dtype=object, shape=0)
         last_index = len(slice_vertices) - 1
         curr_index = 1
         prev_v = slice_vertices[curr_index - 1]
         curr_v = slice_vertices[curr_index]
-        self.slice_vertices = np.append(self.slice_vertices, prev_v)
+        new_slice_vertices = np.append(new_slice_vertices, prev_v)
         while True:
             prev_v = slice_vertices[curr_index - 1]
             curr_v = slice_vertices[curr_index]
-            self.slice_vertices = self.__add_vertices_beetween_two_vertex(self.slice_vertices, prev_v, curr_v)
-            self.slice_vertices = np.append(self.slice_vertices, curr_v)
+            new_slice_vertices = self.__add_vertices_beetween_two_vertex(new_slice_vertices, prev_v, curr_v)
+            new_slice_vertices = np.append(new_slice_vertices, curr_v)
             if curr_index == last_index:
                 break
             else:
                 curr_index = curr_index + 1
         
-        contour1, contour2 = self.__slice_contour()
+        contour1, contour2 = self.__slice_contour(new_slice_vertices)
         return MeshContour(contour1, self.mesh), MeshContour(contour2, self.mesh) 
                 
     def __add_vertices_beetween_two_vertex(self, list, v1, v2):
@@ -176,18 +180,12 @@ class MeshContour:
             return self.__get_inside_directions_from_vertex_beetwen_left_and_bottom_vectors()
         if dir1 == Direction.left and dir2 == Direction.left:
             return self.__get_inside_directions_from_vertex_beetwen_left_and_left_vectors()
-
-        print("trzy kolejne punkty")
-        print(prev_v, curr_v, next_v)
-        print("kontur")
-        print([str(v) for v in self.contour])
-        print("#" * 50)
+        
+        return None
         
         licznik_chujowek += 1
-        if licznik_chujowek > 100:
+        if licznik_chujowek > 20:
             sys.exit()
-       
-        return []
 
     def __get_inside_directions_from_vertex_beetwen_top_and_top_vectors(self):
         return [Direction.right]
@@ -225,27 +223,71 @@ class MeshContour:
     def __get_inside_directions_from_vertex_beetwen_left_and_left_vectors(self):
         return [Direction.top]
     
-    def __slice_contour(self):
-        start_v = self.slice_vertices[0]
-        end_v = self.slice_vertices[self.slice_vertices.size - 1]
+    def __slice_contour(self, new_slice_vertices):
+        start_v = new_slice_vertices[0]
+        end_v = new_slice_vertices[len(new_slice_vertices) - 1]
         index_start_v = np.where(self.contour == start_v)[0][0]
         index_end_v = np.where(self.contour == end_v)[0][0]
         countour_part_1 = self.contour[index_start_v + 1:index_end_v]
-        new_contour_1 = np.append(countour_part_1, self.slice_vertices[::-1])
+        new_contour_1 = np.append(countour_part_1, new_slice_vertices[::-1])
         countour_part_2 = self.contour[:(index_start_v)]
         countour_part_3 = self.contour[(index_end_v + 1):]
-        countour_part_2 = np.append(countour_part_2, self.slice_vertices)
+        countour_part_2 = np.append(countour_part_2, new_slice_vertices)
         new_contour_2 = np.append(countour_part_2, countour_part_3)
 
         first_vertex_1 = new_contour_1[0]        
         last_vertex_1 = new_contour_1[len(new_contour_1) - 1]
         first_vertex_2 = new_contour_2[0]        
         last_vertex_2 = new_contour_2[len(new_contour_2) - 1]
-        new_contour_1 = self.__add_vertices_beetween_two_vertex(new_contour_1, first_vertex_1, last_vertex_1)
-        new_contour_2 = self.__add_vertices_beetween_two_vertex(new_contour_2, first_vertex_2, last_vertex_2)
+        new_contour_1 = self.__add_vertices_beetween_two_vertex(new_contour_1, last_vertex_1, first_vertex_1)
+        new_contour_2 = self.__add_vertices_beetween_two_vertex(new_contour_2, last_vertex_2, first_vertex_2)
 
-        return new_contour_1, new_contour_2      
         
+        if type(self.__is_atomic_square(new_contour_1)) is int:
+            print("kontur")
+            print([str(v) for v in self.contour])        
+            print("ciecie")
+            print([str(v) for v in new_slice_vertices])
+            print("kontur1")
+            print([str(v) for v in new_contour_1])
+            print("kontur2")
+            print([str(v) for v in new_contour_2])
+            print("----------------------------------------------")
+        if type(self.__is_atomic_square(new_contour_2)) is int:
+            print("kontur")
+            print([str(v) for v in self.contour])        
+            print("ciecie")
+            print([str(v) for v in new_slice_vertices])
+            print("kontur1")
+            print([str(v) for v in new_contour_1])
+            print("kontur2")
+            print([str(v) for v in new_contour_2])
+            print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+        if type(self.__is_atomic_square(new_contour_1)) is int:
+            sys.exit()
+        if type(self.__is_atomic_square(new_contour_2)) is int:
+            sys.exit()
+            
+        return new_contour_1, new_contour_2      
+ 
+    def __is_atomic_square(self, parent_contour):
+        for v in parent_contour:
+            index_curr_v = np.where(parent_contour == v)[0][0]
+            index_prev_v = index_curr_v - 1
+            index_next_v = index_curr_v + 1
+            if index_next_v > len(parent_contour) - 1:
+                index_next_v = 0
+            prev_v = parent_contour[index_prev_v]
+            next_v = parent_contour[index_next_v]
+            inside_directions = self.get_inside_directions(prev_v, v, next_v)
+            if not type(inside_directions) is list:
+                return 1
+            existing_directions = v.get_existing_edge_directions()
+            possible_directions = list(set(inside_directions).intersection(existing_directions))
+            if len(possible_directions) > 0:
+                return False
+        return True
+       
         
         
         

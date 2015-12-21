@@ -2,7 +2,7 @@ import mesh_structure.list_numpy as ln
 import time
 import tree_view.meshDrawer as md
 
-fileName = "mesh_tests/test_corner.txt"
+fileName = "mesh_tests/test1"
 
 
 def create_mesh(fileName=fileName):

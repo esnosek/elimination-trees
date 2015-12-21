@@ -5,11 +5,13 @@ from test import create_mesh
 import bintrees as bt
 import unittest
 import tree_view.meshDrawer as md
+from types import *
+import sys
 
 all_countours = bt.FastRBTree()
 counter = 0
 all_contour_counter = 1
-
+sciezka = []
 
 def start(mesh):
     global all_countours
@@ -68,9 +70,17 @@ class ContourNode:
 
     def generate_all_children_division_nodes(self):
         global counter
+        global sciezka
+        
+        if type(self.__is_atomic_square(self.contour)) is int:
+            for parent_node in self.parent_division_nodes:
+                for v in sciezka:
+                    print(v)
+            sys.exit()
         if not self.__is_atomic_square(self.contour):
             possible_cuts = cu.get_possible_cuts(self.contour)
             for path in possible_cuts:
+                sciezka = path
                 new_division_node = DivisionNode(path, self)
                 self.add_children_division(new_division_node)
                 create_tree(new_division_node.contour_node_1, new_division_node)
@@ -89,6 +99,8 @@ class ContourNode:
             prev_v = parent_contour[index_prev_v]
             next_v = parent_contour[index_next_v]
             inside_directions = parent_contour.get_inside_directions(prev_v, v, next_v)
+            if not type(inside_directions) is list:
+                return 1
             existing_directions = v.get_existing_edge_directions()
             possible_directions = list(set(inside_directions).intersection(existing_directions))
             if len(possible_directions) > 0:

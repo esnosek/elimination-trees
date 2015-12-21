@@ -5,6 +5,7 @@ from test import create_mesh
 import unittest
 import random
 import tree_view.meshDrawer as md
+import sys
 # wesja z longest
 
 def get_possible_cuts(contour):
@@ -18,6 +19,9 @@ def get_possible_cuts(contour):
                                                                point_a, 
                                                                contour[point_a_idx + 1])
 
+            if not type(inside_directions) is list:
+                inside_directions = []
+                
             existing_directions = point_a.get_existing_edge_directions()
             
             possible_directions = list(set(inside_directions).intersection(existing_directions))
