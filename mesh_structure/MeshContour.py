@@ -11,17 +11,21 @@ licznik_chujowek = 1
 class MeshContour:
 
     def __init__(self, contour, mesh):
-        if type(self.__is_atomic_square(contour)) is int:
-            print("kontur")
-            print([str(v) for v in contour])        
-            print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
-            sys.exit()
         self.mesh = mesh
         self.contour = contour
         self.contour_index = self.__create_contour_index()
-        self.center = tuple(np.average(np.array(list(self.contour_index.keys())).astype(int), axis=0))
-        #print(type(self.center))
-
+        #self.hash_key = hash(tuple(np.average(np.array(list(self.contour_index.keys())).astype(int), axis=0)))
+        min_el = min(contour)
+        max_el = max(contour)
+        c_x_sum = 0
+        c_y_sum = 0
+        for el in contour:
+            c_x_sum += el.x
+            c_y_sum += el.y
+        #middle_el = contour[len(contour) // 2]
+        self.hash_key =  hash(((min_el.x, min_el.y), (c_x_sum, c_y_sum), (max_el.x, max_el.y)))      
+        #hash(tuple(sorted(self.contour_index.keys())))
+        
     def __create_contour_index(self):
         contour_index = {}
         for v in self.contour:
@@ -29,16 +33,34 @@ class MeshContour:
         return contour_index
 
     def __getitem__(self,index):
-        if index == len(self.contour):
-            index = 0
-        elif index == -1:
-            index = len(self.contour) - 1
-        return self.contour[index]
+#        if index == len(self.contour):
+#            index = 0
+#        elif index == -1:
+#            index = len(self.contour) - 1
+#        return self.contour[index]
+        return self.contour[index % len(self.contour)]
 
     def __len__(self):
         return len(self.contour)
         
-    def __eq__(self, other):   
+    def __eq__(self, other):
+#        if len(self) != len(other):
+#            return False
+#            
+#        if len(self) == 0 and len(other) == 0:
+#            return True
+#            
+#        found_idxs = np.where(other.contour==self.contour[0])[0]
+#        if len(found_idxs) == 0:
+#            return False
+#        
+#        other_idx = found_idxs[0]
+#        
+#        for this_idx in range(len(self.contour)):
+#            if self[this_idx] != other[other_idx]:
+#                return False
+#            other_idx += 1
+#        return True
         return True if self.contour_index == other.contour_index else False
         
     def __str__(self):
@@ -241,36 +263,10 @@ class MeshContour:
         last_vertex_2 = new_contour_2[len(new_contour_2) - 1]
         new_contour_1 = self.__add_vertices_beetween_two_vertex(new_contour_1, last_vertex_1, first_vertex_1)
         new_contour_2 = self.__add_vertices_beetween_two_vertex(new_contour_2, last_vertex_2, first_vertex_2)
-
-        
-        if type(self.__is_atomic_square(new_contour_1)) is int:
-            print("kontur")
-            print([str(v) for v in self.contour])        
-            print("ciecie")
-            print([str(v) for v in new_slice_vertices])
-            print("kontur1")
-            print([str(v) for v in new_contour_1])
-            print("kontur2")
-            print([str(v) for v in new_contour_2])
-            print("----------------------------------------------")
-        if type(self.__is_atomic_square(new_contour_2)) is int:
-            print("kontur")
-            print([str(v) for v in self.contour])        
-            print("ciecie")
-            print([str(v) for v in new_slice_vertices])
-            print("kontur1")
-            print([str(v) for v in new_contour_1])
-            print("kontur2")
-            print([str(v) for v in new_contour_2])
-            print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
-        if type(self.__is_atomic_square(new_contour_1)) is int:
-            sys.exit()
-        if type(self.__is_atomic_square(new_contour_2)) is int:
-            sys.exit()
             
         return new_contour_1, new_contour_2      
  
-    def __is_atomic_square(self, parent_contour):
+    def is_contour_valid(self, parent_contour):
         for v in parent_contour:
             index_curr_v = np.where(parent_contour == v)[0][0]
             index_prev_v = index_curr_v - 1
@@ -281,10 +277,6 @@ class MeshContour:
             next_v = parent_contour[index_next_v]
             inside_directions = self.get_inside_directions(prev_v, v, next_v)
             if not type(inside_directions) is list:
-                return 1
-            existing_directions = v.get_existing_edge_directions()
-            possible_directions = list(set(inside_directions).intersection(existing_directions))
-            if len(possible_directions) > 0:
                 return False
         return True
        

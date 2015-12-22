@@ -37,8 +37,7 @@ class Vertex:
             return self.right_edges.get_shortest_edge()
         elif direction == Direction.bottom:
             return self.bottom_edges.get_shortest_edge()
-        else: 
-            direction == Direction.left
+        elif direction == Direction.left: 
             return self.left_edges.get_shortest_edge()
 
     def get_longest_edge_in_direction(self, direction):
@@ -48,8 +47,7 @@ class Vertex:
             return self.right_edges.get_longest_edge()
         elif direction == Direction.bottom:
             return self.bottom_edges.get_longest_edge()
-        else: 
-            direction == Direction.left
+        elif direction == Direction.left:
             return self.left_edges.get_longest_edge()
             
     def add_incident_edge(self, edge):

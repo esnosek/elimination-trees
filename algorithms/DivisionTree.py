@@ -11,12 +11,13 @@ import sys
 all_countours = bt.FastRBTree()
 counter = 0
 all_contour_counter = 1
-sciezka = []
+
 
 def start(mesh):
     global all_countours
     root = ContourNode(mesh.contour, None)
-    all_countours[hash(root.contour.center)] = [root]
+    #all_countours[root.contour.hash_key] = [root]#np.array([root])
+    all_countours[root.contour.hash_key] = np.array([root])
     
     root.generate_all_children_division_nodes()
 
@@ -25,21 +26,25 @@ def create_tree(parent_contour_node, parent_division_node):
     global all_countours
     global all_contour_counter
     
+    #existing_contour_node = get_from_all_contours(parent_contour_node)
+    
     if is_in_all_contours(parent_contour_node):
         existing_contour_node = get_from_all_contours(parent_contour_node)
         existing_contour_node.add_parent_division(parent_division_node)
     else:
         all_contour_counter += 1
-        perent_hash = hash(parent_contour_node.contour.center)
+        perent_hash = parent_contour_node.contour.hash_key
         if perent_hash in all_countours:
-            all_countours[perent_hash].append(parent_contour_node)
+            #all_countours[perent_hash].append(parent_contour_node)
+            all_countours[perent_hash] = np.append(all_countours[perent_hash], parent_contour_node)
         else:
-            all_countours[perent_hash] = [parent_contour_node]
+            #all_countours[perent_hash] = [parent_contour_node]
+            all_countours[perent_hash] = np.array([parent_contour_node])
             
         parent_contour_node.generate_all_children_division_nodes()
         
 def is_in_all_contours(contour_node):
-    contour_hash_key = hash(contour_node.contour.center)
+    contour_hash_key = contour_node.contour.hash_key
     if contour_hash_key in all_countours:
         for c in all_countours[contour_hash_key]:
             if c == contour_node:
@@ -47,7 +52,7 @@ def is_in_all_contours(contour_node):
     return False
     
 def get_from_all_contours(contour_node):
-    contour_hash_key = hash(contour_node.contour.center)
+    contour_hash_key = contour_node.contour.hash_key
     if contour_hash_key in all_countours:
         for c in all_countours[contour_hash_key]:
             if c == contour_node:
@@ -90,6 +95,7 @@ class ContourNode:
             print(counter)
             for v in self.contour.contour:
                 print(v)
+            print("") 
 
     def __is_atomic_square(self, parent_contour):
         for v in parent_contour.contour:

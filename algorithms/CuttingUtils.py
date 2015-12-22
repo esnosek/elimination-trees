@@ -4,11 +4,19 @@ from mesh_structure.Vertex import Vertex
 from test import create_mesh
 import unittest
 import random
+from copy import copy
 import tree_view.meshDrawer as md
-import sys
+
 # wesja z longest
 
 def get_possible_cuts(contour):
+    
+    if not contour.is_contour_valid(contour.contour):
+        print("kontur zjebany")
+        print([str(v) for v in contour.contour])
+        print("kontur")
+        print(contour.contour_index)
+        
     possible_paths = []
     for point_a_idx in range(len(contour.contour)):
         for point_b_idx in range(point_a_idx + 1, len(contour.contour)):
@@ -18,23 +26,20 @@ def get_possible_cuts(contour):
             inside_directions =  contour.get_inside_directions(contour[point_a_idx - 1],
                                                                point_a, 
                                                                contour[point_a_idx + 1])
-
-            if not type(inside_directions) is list:
-                inside_directions = []
-                
+                                                               
             existing_directions = point_a.get_existing_edge_directions()
             
             possible_directions = list(set(inside_directions).intersection(existing_directions))
             
             if len(inside_directions) > 0:
                 for d in possible_directions:
-                    inside_edge = point_a.get_longest_edge_in_direction(d)
+                    inside_edge = point_a.get_shortest_edge_in_direction(d)
                     used_cross_points = [point_a]
                     second_point_a = get_second_edge_point(point_a, inside_edge)
 
                     find_path(second_point_a, [point_b], get_oposite_direction(d), used_cross_points, possible_paths, contour.contour_index)
 
-                
+               
     return possible_paths
 
 
@@ -42,26 +47,30 @@ def find_path(current_point, end_point_list, arrival_direction, used_cross_point
 
     if current_point in end_point_list:
         
+        used_cross_points = copy(used_cross_points)
         used_cross_points.append(current_point)
-        
         possible_paths.append(used_cross_points)
         
         return True
+        
     elif current_point in used_cross_points or (current_point.x, current_point.y) in contour_index:
         return False
 
     elif is_there_any_way(current_point, arrival_direction, contour_index):
         
         possible_travel_directions = get_possible_directions(current_point, arrival_direction)
+        
+        #possible_travel_directions = get_possible_directions(current_point, arrival_direction)
+        
         if len(possible_travel_directions) > 1:
-            used_cross_points = list(used_cross_points)
+            used_cross_points = copy(used_cross_points)
             used_cross_points.append(current_point)
             
         is_current_useful = False
 
         for direction in possible_travel_directions:
             
-            travel_edge = current_point.get_longest_edge_in_direction(direction) # longest
+            travel_edge = current_point.get_shortest_edge_in_direction(direction) # longest
 
             travel_point = get_second_edge_point(current_point, travel_edge)
 
@@ -182,6 +191,11 @@ class CuttingTests(unittest.TestCase):
         print(len(point_list))
         print(len(point_list2))
         
+        contour1, contour2 = mesh.contour.slice_contour(random_path)
+        md.draw_contour(contour1, 'k')
+        md.draw_contour(contour2, 'r')
+        md.draw_slice(random_path, 'g')
+
 if __name__ == '__main__':
     unittest.main()
         
