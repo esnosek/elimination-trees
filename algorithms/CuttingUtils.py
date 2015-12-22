@@ -10,13 +10,6 @@ import tree_view.meshDrawer as md
 # wesja z longest
 
 def get_possible_cuts(contour):
-    
-    if not contour.is_contour_valid(contour.contour):
-        print("kontur zjebany")
-        print([str(v) for v in contour.contour])
-        print("kontur")
-        print(contour.contour_index)
-        
     possible_paths = []
     for point_a_idx in range(len(contour.contour)):
         for point_b_idx in range(point_a_idx + 1, len(contour.contour)):
@@ -46,11 +39,10 @@ def get_possible_cuts(contour):
 def find_path(current_point, end_point_list, arrival_direction, used_cross_points, possible_paths, contour_index):
 
     if current_point in end_point_list:
-        
         used_cross_points = copy(used_cross_points)
         used_cross_points.append(current_point)
         possible_paths.append(used_cross_points)
-        
+    
         return True
         
     elif current_point in used_cross_points or (current_point.x, current_point.y) in contour_index:
@@ -59,8 +51,6 @@ def find_path(current_point, end_point_list, arrival_direction, used_cross_point
     elif is_there_any_way(current_point, arrival_direction, contour_index):
         
         possible_travel_directions = get_possible_directions(current_point, arrival_direction)
-        
-        #possible_travel_directions = get_possible_directions(current_point, arrival_direction)
         
         if len(possible_travel_directions) > 1:
             used_cross_points = copy(used_cross_points)

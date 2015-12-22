@@ -4,9 +4,6 @@ import numpy as np
 from test import create_mesh
 import bintrees as bt
 import unittest
-import tree_view.meshDrawer as md
-from types import *
-import sys
 
 all_countours = bt.FastRBTree()
 counter = 0
@@ -16,17 +13,13 @@ all_contour_counter = 1
 def start(mesh):
     global all_countours
     root = ContourNode(mesh.contour, None)
-    #all_countours[root.contour.hash_key] = [root]#np.array([root])
     all_countours[root.contour.hash_key] = np.array([root])
-    
     root.generate_all_children_division_nodes()
 
 
 def create_tree(parent_contour_node, parent_division_node):
     global all_countours
     global all_contour_counter
-    
-    #existing_contour_node = get_from_all_contours(parent_contour_node)
     
     if is_in_all_contours(parent_contour_node):
         existing_contour_node = get_from_all_contours(parent_contour_node)
@@ -35,10 +28,8 @@ def create_tree(parent_contour_node, parent_division_node):
         all_contour_counter += 1
         perent_hash = parent_contour_node.contour.hash_key
         if perent_hash in all_countours:
-            #all_countours[perent_hash].append(parent_contour_node)
             all_countours[perent_hash] = np.append(all_countours[perent_hash], parent_contour_node)
         else:
-            #all_countours[perent_hash] = [parent_contour_node]
             all_countours[perent_hash] = np.array([parent_contour_node])
             
         parent_contour_node.generate_all_children_division_nodes()
@@ -61,11 +52,15 @@ def get_from_all_contours(contour_node):
 
 
 class ContourNode:
+
     def __init__(self, contour, parent_division_node):
         self.contour = contour
         self.children_division_nodes = np.empty(dtype=object, shape=0)
         self.parent_division_nodes = np.empty(dtype=object, shape=0)
         self.add_parent_division(parent_division_node)
+
+    def __eq__(self, other):
+        return self.contour == other.contour
 
     def add_parent_division(self, parent_division_node):
         self.parent_division_nodes = np.append(self.parent_division_nodes, parent_division_node)
@@ -75,49 +70,33 @@ class ContourNode:
 
     def generate_all_children_division_nodes(self):
         global counter
-        global sciezka
         
-        if type(self.__is_atomic_square(self.contour)) is int:
-            for parent_node in self.parent_division_nodes:
-                for v in sciezka:
-                    print(v)
-            sys.exit()
         if not self.__is_atomic_square(self.contour):
             possible_cuts = cu.get_possible_cuts(self.contour)
             for path in possible_cuts:
-                sciezka = path
                 new_division_node = DivisionNode(path, self)
                 self.add_children_division(new_division_node)
                 create_tree(new_division_node.contour_node_1, new_division_node)
                 create_tree(new_division_node.contour_node_2, new_division_node)
         else:
             counter = counter + 1
-            print(counter)
-            for v in self.contour.contour:
-                print(v)
-            print("") 
+            print("element ", counter, ": ", self.contour, "\n")
 
     def __is_atomic_square(self, parent_contour):
         for v in parent_contour.contour:
             index_curr_v = np.where(parent_contour.contour == v)[0][0]
-            index_prev_v = index_curr_v - 1
-            index_next_v = index_curr_v + 1
-            prev_v = parent_contour[index_prev_v]
-            next_v = parent_contour[index_next_v]
+            prev_v = parent_contour[index_curr_v - 1]
+            next_v = parent_contour[index_curr_v + 1]
             inside_directions = parent_contour.get_inside_directions(prev_v, v, next_v)
-            if not type(inside_directions) is list:
-                return 1
             existing_directions = v.get_existing_edge_directions()
             possible_directions = list(set(inside_directions).intersection(existing_directions))
             if len(possible_directions) > 0:
                 return False
         return True
 
-    def __eq__(self, other):
-        return self.contour == other.contour
-
 
 class DivisionNode:
+
     def __init__(self, path, parent_contour_node):
         self.parent_contour_node = parent_contour_node
         new_contour1, new_contour2 = parent_contour_node.contour.slice_contour(path)
@@ -130,8 +109,8 @@ class DivisionTreeTests(unittest.TestCase):
         global all_countours
         mesh = create_mesh()
         start(mesh)
-        print(len(all_countours))
-        print(all_contour_counter)
+        print("ilość unikalnych hashcodów: ", len(all_countours))
+        print("ilosc wszystkich kontorów: ", all_contour_counter)
 
 if __name__ == '__main__':
     unittest.main()

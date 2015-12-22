@@ -2,11 +2,7 @@
 
 import numpy as np
 from mesh_structure.Direction import Direction
-import tree_view.meshDrawer as md
 from numpy import mean
-import sys
-
-licznik_chujowek = 1
 
 class MeshContour:
 
@@ -14,7 +10,6 @@ class MeshContour:
         self.mesh = mesh
         self.contour = contour
         self.contour_index = self.__create_contour_index()
-        #self.hash_key = hash(tuple(np.average(np.array(list(self.contour_index.keys())).astype(int), axis=0)))
         min_el = min(contour)
         max_el = max(contour)
         c_x_sum = 0
@@ -22,9 +17,7 @@ class MeshContour:
         for el in contour:
             c_x_sum += el.x
             c_y_sum += el.y
-        #middle_el = contour[len(contour) // 2]
         self.hash_key =  hash(((min_el.x, min_el.y), (c_x_sum, c_y_sum), (max_el.x, max_el.y)))      
-        #hash(tuple(sorted(self.contour_index.keys())))
         
     def __create_contour_index(self):
         contour_index = {}
@@ -33,41 +26,18 @@ class MeshContour:
         return contour_index
 
     def __getitem__(self,index):
-#        if index == len(self.contour):
-#            index = 0
-#        elif index == -1:
-#            index = len(self.contour) - 1
-#        return self.contour[index]
         return self.contour[index % len(self.contour)]
 
     def __len__(self):
         return len(self.contour)
         
     def __eq__(self, other):
-#        if len(self) != len(other):
-#            return False
-#            
-#        if len(self) == 0 and len(other) == 0:
-#            return True
-#            
-#        found_idxs = np.where(other.contour==self.contour[0])[0]
-#        if len(found_idxs) == 0:
-#            return False
-#        
-#        other_idx = found_idxs[0]
-#        
-#        for this_idx in range(len(self.contour)):
-#            if self[this_idx] != other[other_idx]:
-#                return False
-#            other_idx += 1
-#        return True
         return True if self.contour_index == other.contour_index else False
         
     def __str__(self):
         to_str = ""
         for v in self.contour:
             to_str += str(v)
-        
         return to_str
         
     def get_center(self):
@@ -89,7 +59,6 @@ class MeshContour:
                 break
             else:
                 curr_index = curr_index + 1
-        
         contour1, contour2 = self.__slice_contour(new_slice_vertices)
         return MeshContour(contour1, self.mesh), MeshContour(contour2, self.mesh) 
                 
@@ -174,8 +143,6 @@ class MeshContour:
         return list
 
     def get_inside_directions(self, prev_v, curr_v, next_v):
-        global licznik_chujowek
-        
         dir1 = self.__get_vector_direction(prev_v, curr_v)
         dir2 = self.__get_vector_direction(curr_v, next_v)
         if dir1 == Direction.top and dir2 == Direction.top:
@@ -202,12 +169,7 @@ class MeshContour:
             return self.__get_inside_directions_from_vertex_beetwen_left_and_bottom_vectors()
         if dir1 == Direction.left and dir2 == Direction.left:
             return self.__get_inside_directions_from_vertex_beetwen_left_and_left_vectors()
-        
-        return None
-        
-        licznik_chujowek += 1
-        if licznik_chujowek > 20:
-            sys.exit()
+
 
     def __get_inside_directions_from_vertex_beetwen_top_and_top_vectors(self):
         return [Direction.right]
@@ -256,29 +218,8 @@ class MeshContour:
         countour_part_3 = self.contour[(index_end_v + 1):]
         countour_part_2 = np.append(countour_part_2, new_slice_vertices)
         new_contour_2 = np.append(countour_part_2, countour_part_3)
-
-        first_vertex_1 = new_contour_1[0]        
-        last_vertex_1 = new_contour_1[len(new_contour_1) - 1]
-        first_vertex_2 = new_contour_2[0]        
-        last_vertex_2 = new_contour_2[len(new_contour_2) - 1]
-        new_contour_1 = self.__add_vertices_beetween_two_vertex(new_contour_1, last_vertex_1, first_vertex_1)
-        new_contour_2 = self.__add_vertices_beetween_two_vertex(new_contour_2, last_vertex_2, first_vertex_2)
-            
         return new_contour_1, new_contour_2      
- 
-    def is_contour_valid(self, parent_contour):
-        for v in parent_contour:
-            index_curr_v = np.where(parent_contour == v)[0][0]
-            index_prev_v = index_curr_v - 1
-            index_next_v = index_curr_v + 1
-            if index_next_v > len(parent_contour) - 1:
-                index_next_v = 0
-            prev_v = parent_contour[index_prev_v]
-            next_v = parent_contour[index_next_v]
-            inside_directions = self.get_inside_directions(prev_v, v, next_v)
-            if not type(inside_directions) is list:
-                return False
-        return True
+
        
         
         

@@ -6,3 +6,5 @@ QTextCursor::setPosition: Position '7685' out of range
 QTextCursor::setPosition: Position '7769' out of range
 QTextCursor::setPosition: Position '10172' out of range
 QTextCursor::setPosition: Position '25257' out of range
+QTextCursor::setPosition: Position '10982' out of range
+QTextCursor::setPosition: Position '10982' out of range
