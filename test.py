@@ -2,8 +2,8 @@ import mesh_structure.list_numpy as ln
 import time
 import tree_view.meshDrawer as md
 
+# fileName = "mesh_tests/zwykla_siatka_4x4"
 fileName = "mesh_tests/test2"
-
 
 def create_mesh(fileName=fileName):
     mesh = ln.load_file(fileName)

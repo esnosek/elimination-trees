@@ -1,6 +1,33 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
+counter = 1
+
+def draw_tree_node(root_node):
+    global counter
+    fig, ax = plt.subplots(200,1)
+    from algorithms.DivisionTree import TreeLeaf
+    while root_node is not TreeLeaf:
+        draw_contour_from_optimal_tree(root_node.contour, 'k', ax)
+        counter += 1
+        draw_tree_node(root_node.child1)
+        draw_tree_node(root_node.child2)
+    
+
+def draw_contour_from_optimal_tree(vertex_list, colour, ax):
+    global counter
+    last_index = len(vertex_list) - 1
+    for vertex in vertex_list:
+        curr_index = np.where(vertex_list == vertex)[0][0]
+        if curr_index == last_index:
+            next_index = 0
+        else:
+            next_index = curr_index + 1
+        v1 = vertex_list[curr_index]
+        v2 = vertex_list[next_index]
+        ax[counter].plot([v1.x, v2.x], [v1.y, v2.y], colour)
+    plt.show()
+        
 def draw_mesh_with_cutting_edge(mesh):
     plt.axis([-2, 16 + 2, -2, 8 + 2])
 
@@ -70,3 +97,8 @@ def draw_contour(vertex_list, colour):
         v1 = vertex_list[curr_index]
         v2 = vertex_list[next_index]
         plt.plot([v1.x, v2.x], [v1.y, v2.y], colour)
+
+def draw_slice_and_contour(node):
+    draw_slice(node.path, 'r')
+    draw_contour(node.contour.contour, 'k')   
+    
