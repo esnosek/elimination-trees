@@ -103,3 +103,34 @@ def draw_slice_and_contour(node):
     draw_slice(node.path, 'r')
     draw_contour(node.contour.contour, 'k')   
     
+    
+    
+def draw_tree():
+    from ete3 import Tree, faces, TreeStyle
+    
+    # Loads an example tree
+    nw = """
+    (((Dme:0.008339,Dme:0.300613)1.000000:0.596401,
+    (Cfa:0.640858,Hsa:0.753230)1.000000:0.182035)1.000000:0.106234,
+    ((Dre:0.271621,Cfa:0.046042)1.000000:0.953250,
+    (Hsa:0.061813,Mms:0.110769)1.000000:0.204419)1.000000:0.973467);
+    """
+    t = Tree(nw)
+    
+    # Create faces based on external images
+    humanFace = faces.ImgFace("foo.png")#, width=500, height=500)
+    
+    def mylayout(node):
+        if node.is_leaf():
+            pass
+        else:
+    
+            faces.add_face_to_node(humanFace, node, 1)
+    
+        if node.is_leaf() and node.name.startswith("Hsa"):
+            node.img_style["bgcolor"] = "#9db0cf"
+    
+    # And, finally, Visualize the tree using my own layout function
+    ts = TreeStyle()
+    ts.layout_fn = mylayout
+    t.show(tree_style = ts)
