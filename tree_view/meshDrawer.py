@@ -97,6 +97,7 @@ def draw_contour(vertex_list, colour):
         v1 = vertex_list[curr_index]
         v2 = vertex_list[next_index]
         plt.plot([v1.x, v2.x], [v1.y, v2.y], colour)
+    plt.savefig('foo.png')
 
 def draw_slice_and_contour(node):
     draw_slice(node.path, 'r')
