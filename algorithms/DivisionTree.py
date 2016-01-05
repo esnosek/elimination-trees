@@ -21,26 +21,27 @@ def start(mesh):
     root_contour_node = ContourNode(mesh.contour, None)
     all_countours[root_contour_node.contour.hash_key] = np.array([root_contour_node])
     cost = root_contour_node.generate_all_children_division_nodes()
-    #print(cost, [str(v) for v in root_optimal_tree.path])
     print(cost)
     root_contour_node.set_lowest_cost()
     root = create_optimal_tree(root_contour_node)
     md.draw_slice_and_contour(root)
 
 def create_optimal_tree(contour_node):
+    contour_node = get_from_all_contours(contour_node)
     if contour_node.is_atomic_square(contour_node.contour):
         return TreeLeaf(contour_node.contour)
     contour_node.set_lowest_cost()
+    print('-----------')
+    print(len(contour_node.children_division_nodes))
     for division in contour_node.children_division_nodes:
         print(contour_node.lowest_cost, division.cost)
+    for division in contour_node.children_division_nodes:
         if contour_node.lowest_cost == division.cost:
-            print(division.contour_node_1.contour)
-            print(division.contour_node_2.contour)
             tree_node_1 = create_optimal_tree(division.contour_node_1)
             tree_node_2 = create_optimal_tree(division.contour_node_2)
             return TreeNode(contour_node.contour, division.path, tree_node_1, tree_node_2)
-            break
-    print("---------------")
+
+
 
  
 def create_tree(parent_contour_node, parent_division_node):
@@ -57,7 +58,7 @@ def create_tree(parent_contour_node, parent_division_node):
             all_countours[perent_hash] = np.append(all_countours[perent_hash], parent_contour_node)
         else:
             all_countours[perent_hash] = np.array([parent_contour_node])
-            return parent_contour_node.generate_all_children_division_nodes()
+        return parent_contour_node.generate_all_children_division_nodes()
 
 def is_in_optimal_tree_nodes(contour_node):
     contour_hash_key = contour_node.contour.hash_key
@@ -138,6 +139,7 @@ class ContourNode:
         global optimal_tree_nodes
         global counter
         global ilosc_rozwiazan
+        global ile_razy
         lowest_cost = 9999999
         
         if not self.is_atomic_square(self.contour):
@@ -184,8 +186,17 @@ class DivisionNode:
         self.path = path
         self.parent_contour_node = parent_contour_node
         new_contour1, new_contour2 = parent_contour_node.contour.slice_contour(path)
+        
         self.contour_node_1 = ContourNode(new_contour1, self)
+        if is_in_all_contours(self.contour_node_1):
+            existing_contour_node = get_from_all_contours(self.contour_node_1)
+            self.contour_node_1 = existing_contour_node
+                
         self.contour_node_2 = ContourNode(new_contour2, self)
+        if is_in_all_contours(self.contour_node_2):
+            existing_contour_node = get_from_all_contours(self.contour_node_2)
+            self.contour_node_2 = existing_contour_node
+        
         self.cost = None
 
 class DivisionTreeTests(unittest.TestCase):
