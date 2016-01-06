@@ -14,6 +14,10 @@ class Mesh:
         self.upper_right_vertex = self.__get_upper_right_vertex()
         self.lower_right_vertex = self.__get_lower_right_vertex()
         self.contour = MeshContour(self.__create_mesh_contour(), self)
+        self.min_x = 0
+        self.min_y = 0
+        self.max_x = self.vertex_list.get_max_x()
+        self.max_y = self.vertex_list.get_max_y()
 
     def __get_lower_left_vertex(self):
         return self.vertex_list.get_vertex((0, 0))
