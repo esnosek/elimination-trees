@@ -14,6 +14,8 @@ ilosc_rozwiazan = 1
 root = None
 root_contour_node = None
 global_mesh = None
+node_id = 0
+
 
 def start(mesh):
     global all_countours
@@ -26,7 +28,7 @@ def start(mesh):
     root_contour_node.generate_all_children_division_nodes()
     root_contour_node.set_lowest_cost()
     root = create_optimal_tree(root_contour_node)
-    md.draw_contour_with_interior_and_slice(root.children[0])
+    #md.draw_leaf(mesh, root.children[0].child2.children[0], 'h')
 
 def create_optimal_tree(contour_node):
     if contour_node.is_atomic_square(contour_node.contour):
@@ -88,7 +90,31 @@ def get_from_all_contours(contour_node):
                 return c
     return False
     
+def create_tree_string(mesh, node):
+    global node_id
 
+    if type(node) is TreeNode:
+        node_id += 1
+        my_id = node_id
+        md.draw_contour_with_interior_and_slice(mesh, node.children[0], 'tmp/%s.png' % node_id)
+        c1_str = create_tree_string(mesh, node.children[0].child1)
+        c2_str = create_tree_string(mesh, node.children[0].child2)
+        return '(' + c1_str + ',' + c2_str + ')' + str(my_id)
+    else:
+        node_id += 1
+        md.draw_leaf(mesh, node, 'tmp/%s.png' % node_id)
+        return str(node_id)
+
+def clear_tmp():
+    import os
+    folder = 'tmp'
+    for the_file in os.listdir(folder):
+        file_path = os.path.join(folder, the_file)
+        try:
+            if os.path.isfile(file_path):
+                os.unlink(file_path)
+        except e:
+            print(e)
 
 class TreeNode:
     
@@ -220,11 +246,17 @@ class DivisionTreeTests(unittest.TestCase):
 
     def test_cut(self):
         global all_countours
+        global counter
         mesh = create_mesh()
         start(mesh)
         print("ilość unikalnych hashcodów: ", len(all_countours))
         print("ilosc wszystkich kontorów: ", all_contour_counter)
         print(ilosc_rozwiazan)
+        
+        clear_tmp()        
+        tree_string = create_tree_string(mesh, root)
+        tree_string += ';'
+        md.draw_tree(tree_string)
 
 if __name__ == '__main__':
     unittest.main()
