@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-#plt.figure(figsize=(6, 6))
+plt.figure(figsize=(6, 6))
 counter = 1
 
 used_vertices = {}
@@ -46,36 +46,7 @@ def draw_mesh_with_cutting_edge(mesh):
         plt.plot([edge.v1.x, edge.v2.x], [edge.v1.y, edge.v2.y], 'r')
     plt.show()
 
-def draw_mesh(mesh, depth_level):
-    plt.axis([-2, 16 + 2, -2, 8 + 2])
-    
-    if depth_level == 0:
-        for key in mesh.edge_list.edge_tree:
-            edge = mesh.edge_list.edge_tree[key]
-            plt.plot([edge.v1.x, edge.v2.x], [edge.v1.y, edge.v2.y], 'k')
-    else:
-        for key in mesh.face_list.face_tree:
-            face = mesh.face_list.face_tree[key]
-            for e in face.edge_list:
-                if face.level <= depth_level:
-                    plt.plot([e.v1.x, e.v2.x], [e.v1.y, e.v2.y], 'k')
 
-def draw_slice_vertices_with_edges(slice_vertices, colour):
-    plt.axis([-2, 16 + 2, -2, 8 + 2])
-    for vertex in slice_vertices:
-        for key in vertex.top_edges.edge_incident:
-            e = vertex.top_edges.edge_incident[key]
-            plt.plot([e.v1.x, e.v2.x], [e.v1.y, e.v2.y], colour)
-        for key in vertex.bottom_edges.edge_incident:
-            e = vertex.bottom_edges.edge_incident[key]
-            plt.plot([e.v1.x, e.v2.x], [e.v1.y, e.v2.y], colour)
-        for key in vertex.right_edges.edge_incident:
-            e = vertex.right_edges.edge_incident[key]
-            plt.plot([e.v1.x, e.v2.x], [e.v1.y, e.v2.y], colour)
-        for key in vertex.left_edges.edge_incident:
-            e = vertex.left_edges.edge_incident[key]
-            plt.plot([e.v1.x, e.v2.x], [e.v1.y, e.v2.y], colour)
- 
 def draw_contour_with_interior_and_slice(tree_node_child):
     plt.axis([tree_node_child.contour.min_x, tree_node_child.contour.max_x,
               tree_node_child.contour.min_y, tree_node_child.contour.max_y])
@@ -142,30 +113,8 @@ def visit_node(v, contour, colour):
         plt.plot([v.x, v2.x], [v.y, v2.y], colour, linewidth=2.0)
         if not (v2.x, v2.y) in used_vertices:
             visit_node(v2, contour, colour)
-  
-    
-
-def draw_slice_and_contour(mesh, tree_node, file_name='tmp.png'):
-    for child in tree_node.children:
-        draw_slice(mesh, child.path, 'r')
-    draw_contour(mesh, tree_node.contour.contour, 'k')   
-    plt.savefig(file_name)
-    
-def clear_tmp():
-    import os, shutil
-    folder = 'tmp'
-    for the_file in os.listdir(folder):
-        file_path = os.path.join(folder, the_file)
-        try:
-            if os.path.isfile(file_path):
-                os.unlink(file_path)
-        except e:
-            print(e)
-    
-def draw_tree(tree):
-    
-    leaf_id = 0    
-    
+               
+def draw_tree():
     from ete3 import Tree, faces, TreeStyle
     
     # Loads an example tree
@@ -194,10 +143,3 @@ def draw_tree(tree):
     ts = TreeStyle()
     ts.layout_fn = mylayout
     t.show(tree_style = ts)
-    
-
-
-    
-    
-    
-

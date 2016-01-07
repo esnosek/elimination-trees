@@ -14,6 +14,10 @@ class MeshContour:
         max_el = max(contour)
         c_x_sum = 0
         c_y_sum = 0
+        self.max_x = self.get_max_x()
+        self.min_x = self.get_min_x()
+        self.max_y = self.get_max_y()
+        self.min_y = self.get_min_y()        
         for el in contour:
             c_x_sum += el.x
             c_y_sum += el.y
@@ -40,6 +44,34 @@ class MeshContour:
             to_str += str(v)
         return to_str
         
+    def get_max_x(self):
+        max_x = self.contour[0].x
+        for v in self.contour:
+            if v.x > max_x:
+                max_x = v.x
+        return max_x
+
+    def get_min_x(self):
+        min_x = self.contour[0].x
+        for v in self.contour:
+            if v.x < min_x:
+                min_x = v.x
+        return min_x
+
+    def get_max_y(self):
+        max_y = self.contour[0].y
+        for v in self.contour:
+            if v.y > max_y:
+                max_y = v.y
+        return max_y
+
+    def get_min_y(self):
+        min_y = self.contour[0].y
+        for v in self.contour:
+            if v.y < min_y:
+                min_y = v.y
+        return min_y
+    
     def get_center(self):
         return tuple(map(mean, zip(*self.contour)))
         
@@ -219,12 +251,3 @@ class MeshContour:
         countour_part_2 = np.append(countour_part_2, new_slice_vertices)
         new_contour_2 = np.append(countour_part_2, countour_part_3)
         return new_contour_1, new_contour_2      
-
-       
-        
-        
-        
-        
-        
-        
-        

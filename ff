@@ -26,7 +26,7 @@ def start(mesh):
     root_contour_node.generate_all_children_division_nodes()
     root_contour_node.set_lowest_cost()
     root = create_optimal_tree(root_contour_node)
-    md.draw_contour_with_interior_and_slice(root.children[0])
+    md.draw_contour_with_interior_and_slice(root.children[0].child1.children[0])
 
 def create_optimal_tree(contour_node):
     if contour_node.is_atomic_square(contour_node.contour):
@@ -87,8 +87,6 @@ def get_from_all_contours(contour_node):
             if c == contour_node:
                 return c
     return False
-    
-
 
 class TreeNode:
     
@@ -228,3 +226,4 @@ class DivisionTreeTests(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
