@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
+
 plt.figure(figsize=(16, 8))
 counter = 1
 
@@ -98,16 +99,29 @@ def draw_contour(mesh, vertex_list, colour):
         v1 = vertex_list[curr_index]
         v2 = vertex_list[next_index]
         plt.plot([v1.x, v2.x], [v1.y, v2.y], colour)
-    plt.savefig('foo.png')
+    
 
-def draw_slice_and_contour(mesh, tree_node):
+def draw_slice_and_contour(mesh, tree_node, file_name='tmp.png'):
     for child in tree_node.children:
         draw_slice(mesh, child.path, 'r')
     draw_contour(mesh, tree_node.contour.contour, 'k')   
+    plt.savefig(file_name)
     
+def clear_tmp():
+    import os, shutil
+    folder = 'tmp'
+    for the_file in os.listdir(folder):
+        file_path = os.path.join(folder, the_file)
+        try:
+            if os.path.isfile(file_path):
+                os.unlink(file_path)
+        except e:
+            print(e)
     
+def draw_tree(tree):
     
-def draw_tree():
+    leaf_id = 0    
+    
     from ete3 import Tree, faces, TreeStyle
     
     # Loads an example tree
@@ -136,3 +150,10 @@ def draw_tree():
     ts = TreeStyle()
     ts.layout_fn = mylayout
     t.show(tree_style = ts)
+    
+
+
+    
+    
+    
+

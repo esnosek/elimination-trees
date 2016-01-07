@@ -87,6 +87,8 @@ def get_from_all_contours(contour_node):
             if c == contour_node:
                 return c
     return False
+    
+
 
 class TreeNode:
     
