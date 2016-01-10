@@ -202,8 +202,8 @@ class ContourNode:
             return self.get_cost()
 
     def __dej_mi_zlaczenia_koszt(self, division_node):
-        a = 2*len(division_node.path) - 1
-        b = 2 * len(division_node.parent_contour_node.contour) + a - 2
+        a = 2*len(division_node.path) - 3
+        b = 2 * len(division_node.parent_contour_node.contour) + a
         cost = self.cost(a, b)
         return cost
         

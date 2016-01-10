@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from ete3 import Tree, faces, TreeStyle
 
-#plt.figure(figsize=(6, 6))
+plt.figure(figsize=(6, 6))
 counter = 1
 
 used_vertices = {}
@@ -19,10 +19,11 @@ def draw_tree_node(root_node):
         draw_tree_node(root_node.child2)
     
 
-def draw_mesh(mesh, colour):
+def draw_mesh(mesh, colour, file_name):
     for key in mesh.edge_list.edge_tree:
         edge = mesh.edge_list.edge_tree[key]
-        plt.plot([edge.v1.x, edge.v2.x], [edge.v1.y, edge.v2.y], colour, linestyle='dotted')
+        plt.plot([edge.v1.x, edge.v2.x], [edge.v1.y, edge.v2.y], colour)
+    plt.savefig(file_name)
 
 def draw_contour_from_optimal_tree(vertex_list, colour, ax):
     global counter
@@ -40,14 +41,14 @@ def draw_contour_from_optimal_tree(vertex_list, colour, ax):
 
 def draw_leaf(mesh, tree_leaf, file_name):
     plt.clf()
-    plt.axis([mesh.min_x, mesh.max_x, mesh.min_y, mesh.max_y])
+    #plt.axis([mesh.min_x, mesh.max_x, mesh.min_y, mesh.max_y])
     draw_mesh(mesh, 'k')
     draw_contour(tree_leaf.contour, 'k')
     plt.savefig(file_name)
 
 def draw_contour_with_interior_and_slice(mesh, tree_node_child, file_name):
     plt.clf()
-    plt.axis([mesh.min_x, mesh.max_x, mesh.min_y, mesh.max_y])
+    #plt.axis([mesh.min_x, mesh.max_x, mesh.min_y, mesh.max_y])
     draw_mesh(mesh, 'k')
     draw_contour(tree_node_child.contour, 'k')
     draw_contour_interior(tree_node_child.contour, 'k')

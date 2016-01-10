@@ -3,9 +3,11 @@ import time
 import tree_view.meshDrawer as md
 
 #fileName = "mesh_tests/test_kwadracik"
-#fileName = "mesh_tests/test2"
+#fileName = "mesh_tests/test1"
 #fileName = "mesh_tests/zwykla_siatka_4x4"
-fileName = "mesh_tests/test1"
+#fileName = "mesh_tests/test_corner"
+#fileName = "mesh_tests/edge"
+fileName = "mesh_tests/vertex"
 
 def create_mesh(fileName=fileName):
     mesh = ln.load_file(fileName)
@@ -27,4 +29,4 @@ mesh = create_mesh(fileName)
 end_time = int(round(time.time() * 100000))
 print('czas: ' + str((end_time - start_time)/100000) + 's')
 
-md.draw_mesh(mesh, 'k')
+md.draw_mesh(mesh, 'k', "osob_punkt/4level.jpg")
