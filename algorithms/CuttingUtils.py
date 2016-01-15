@@ -26,7 +26,7 @@ def get_possible_cuts(contour):
             
             if len(inside_directions) > 0:
                 for d in possible_directions:
-                    inside_edge = point_a.get_shortest_edge_in_direction(d)
+                    inside_edge = point_a.get_longest_edge_in_direction(d)
                     used_cross_points = [point_a]
                     second_point_a = get_second_edge_point(point_a, inside_edge)
 
@@ -52,15 +52,15 @@ def find_path(current_point, end_point_list, arrival_direction, used_cross_point
         
         possible_travel_directions = get_possible_directions(current_point, arrival_direction)
         
-        if len(possible_travel_directions) > 1:
-            used_cross_points = copy(used_cross_points)
-            used_cross_points.append(current_point)
+        #if len(possible_travel_directions) > 1:
+        used_cross_points = copy(used_cross_points)
+        used_cross_points.append(current_point)
             
         is_current_useful = False
 
         for direction in possible_travel_directions:
             
-            travel_edge = current_point.get_shortest_edge_in_direction(direction) # longest
+            travel_edge = current_point.get_longest_edge_in_direction(direction) # longest
 
             travel_point = get_second_edge_point(current_point, travel_edge)
 

@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from ete3 import Tree, faces, TreeStyle
 
-plt.figure(figsize=(6, 6))
+plt.figure(figsize=(6,6))
 counter = 1
 
 used_vertices = {}
@@ -39,23 +39,35 @@ def draw_contour_from_optimal_tree(vertex_list, colour, ax):
         ax[counter].plot([v1.x, v2.x], [v1.y, v2.y], colour)
     plt.show()
 
-def draw_leaf(mesh, tree_leaf, file_name):
+def draw_leaf(mesh, tree_leaf, file_name, cost):
     plt.clf()
     #plt.axis([mesh.min_x, mesh.max_x, mesh.min_y, mesh.max_y])
-    draw_mesh(mesh, 'k')
+    plt.xlabel(int(cost), fontsize=110)
+    plt.gcf().subplots_adjust(bottom=0.30)
+    draw_mesh(mesh, 'k', "do_usuniecia")
     draw_contour(tree_leaf.contour, 'k')
     plt.savefig(file_name)
 
-def draw_contour_with_interior_and_slice(mesh, tree_node_child, file_name):
+def draw_contour_with_interior_and_slice(mesh, tree_node_child, file_name, cost):
     plt.clf()
     #plt.axis([mesh.min_x, mesh.max_x, mesh.min_y, mesh.max_y])
-    draw_mesh(mesh, 'k')
+    plt.xlabel(int(cost), fontsize=110)
+    plt.gcf().subplots_adjust(bottom=0.30)
+    draw_mesh(mesh, 'k', "do_usuniecia")
     draw_contour(tree_node_child.contour, 'k')
     draw_contour_interior(tree_node_child.contour, 'k')
     draw_slice(tree_node_child.path, 'r')
     plt.savefig(file_name)
 
 
+def draw_contour_with_interior_and_slice_from_division_node(mesh, division_node, file_name):
+    plt.clf()
+    draw_mesh(mesh, 'k', "do_usuniecia")
+    draw_contour(division_node.parent_contour_node.contour, 'k')
+    draw_contour_interior(division_node.parent_contour_node.contour, 'k')
+    draw_slice(division_node.path, 'r')
+    plt.savefig(file_name)
+    
 def draw_slice(slice_vertices, colour):
     last_index = len(slice_vertices) - 1
     curr_index = 0
@@ -65,7 +77,7 @@ def draw_slice(slice_vertices, colour):
         next_index = curr_index + 1
         v1 = slice_vertices[curr_index]
         v2 = slice_vertices[next_index]
-        plt.plot([v1.x, v2.x], [v1.y, v2.y], colour, linewidth=2.0)
+        plt.plot([v1.x, v2.x], [v1.y, v2.y], colour, linewidth=4.0)
         curr_index = curr_index + 1
 
 
@@ -79,7 +91,7 @@ def draw_contour(contour, colour):
             next_index = curr_index + 1
         v1 = contour[curr_index]
         v2 = contour[next_index]
-        plt.plot([v1.x, v2.x], [v1.y, v2.y], colour, linewidth=2.0)
+        plt.plot([v1.x, v2.x], [v1.y, v2.y], colour, linewidth=4.0)
 
 
 def draw_contour_interior(contour, colour):
@@ -123,6 +135,15 @@ def draw_slice_and_contour(mesh, tree_node, file_name='tmp.png'):
     draw_contour(mesh, tree_node.contour.contour, 'k')   
     plt.savefig(file_name)
 
+
+def draw_table():
+    plt.axis([0, 9, 0, 9])
+    i = 1
+    while i <= 9:
+        plt.plot([i,i],[0,9], 'k', linewidth=2.0)
+        plt.plot([0,9],[i,i], 'k', linewidth=2.0)
+        i += 1
+    plt.savefig("tabelka.png")
     
 def draw_tree(tree_string):
     

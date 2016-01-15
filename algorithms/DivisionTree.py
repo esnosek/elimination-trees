@@ -15,6 +15,8 @@ root = None
 root_contour_node = None
 global_mesh = None
 node_id = 0
+division_counter = 0
+optimal_tree_counter = 1
 
 
 def start(mesh):
@@ -28,13 +30,22 @@ def start(mesh):
     root_contour_node.generate_all_children_division_nodes()
     root_contour_node.set_lowest_cost()
     root = create_optimal_tree(root_contour_node)
+    print("wszystkie podziały ", division_counter)
+    print("optymalne drzewa ", optimal_tree_counter)
     #md.draw_leaf(mesh, root.children[0].child2.children[0], 'h')
+    
+#    i = 1
+#        file_name = "podzial" + str(i)
+#        i += 1
+#        md.draw_contour_with_interior_and_slice_from_division_node(mesh, d, file_name)
 
 def create_optimal_tree(contour_node):
+    global optimal_tree_counter
     if contour_node.is_atomic_square(contour_node.contour):
-        return TreeLeaf(contour_node.contour)
+        return TreeLeaf(contour_node.contour, contour_node.lowest_cost)
     lowest_cost_divisions = contour_node.get_divisions_with_lowest_cost()
-    tree_node = TreeNode()
+    tree_node = TreeNode(contour_node.lowest_cost)
+    optimal_tree_counter = optimal_tree_counter + len(lowest_cost_divisions)-1
     for division in lowest_cost_divisions:
         child_1 = create_optimal_tree(division.contour_node_1)
         child_2 = create_optimal_tree(division.contour_node_2)
@@ -96,13 +107,13 @@ def create_tree_string(mesh, node):
     if type(node) is TreeNode:
         node_id += 1
         my_id = node_id
-        md.draw_contour_with_interior_and_slice(mesh, node.children[0], 'tmp/%s.png' % node_id)
+        md.draw_contour_with_interior_and_slice(mesh, node.children[0], 'tmp/%s.png' % node_id, node.cost)
         c1_str = create_tree_string(mesh, node.children[0].child1)
         c2_str = create_tree_string(mesh, node.children[0].child2)
         return '(' + c1_str + ',' + c2_str + ')' + str(my_id)
     else:
         node_id += 1
-        md.draw_leaf(mesh, node, 'tmp/%s.png' % node_id)
+        md.draw_leaf(mesh, node, 'tmp/%s.png' % node_id, node.cost)
         return str(node_id)
 
 def clear_tmp():
@@ -118,8 +129,9 @@ def clear_tmp():
 
 class TreeNode:
     
-    def __init__(self):
+    def __init__(self, cost):
         self.children = []
+        self.cost = cost
         
     def add_child(self, child1, child2, contour, path):
         self.children.append(TreeNodeChild(child1, child2, contour, path))
@@ -133,8 +145,9 @@ class TreeNodeChild:
         
 class TreeLeaf:
 
-    def __init__(self, contour):
+    def __init__(self, contour, cost):
         self.contour = contour
+        self.cost = cost
     
 class ContourNode:
 
@@ -173,15 +186,13 @@ class ContourNode:
         return self.cost(a, b)
 
     def generate_all_children_division_nodes(self):
-        global optimal_tree_nodes
-        global counter
-        global ilosc_rozwiazan
-        global ile_razy
+        global division_counter
         lowest_cost = 9999999
         
         if not self.is_atomic_square(self.contour):
             possible_cuts = cu.get_possible_cuts(self.contour)
             for path in possible_cuts:
+                division_counter += 1
                 new_division_node = DivisionNode(path, self)
                 self.add_children_division(new_division_node)
                 cost_of_child_1 = create_tree(new_division_node.contour_node_1, new_division_node)
@@ -189,13 +200,10 @@ class ContourNode:
                 new_division_node.contour_node_1.lowest_cost = cost_of_child_1
                 new_division_node.contour_node_2.lowest_cost = cost_of_child_2
                 zlaczenia_koszt = self.__dej_mi_zlaczenia_koszt(new_division_node)
-                laczny_koszt = cost_of_child_1 + cost_of_child_2 + zlaczenia_koszt
-                new_division_node.cost = laczny_koszt
-                if laczny_koszt == lowest_cost:
-                    ilosc_rozwiazan += 1
-                if laczny_koszt < lowest_cost:
-                    ilosc_rozwiazan = 1
-                    lowest_cost = laczny_koszt
+                total_cost = cost_of_child_1 + cost_of_child_2 + zlaczenia_koszt
+                new_division_node.cost = total_cost
+                if total_cost < lowest_cost:
+                    lowest_cost = total_cost
                 
             return lowest_cost
         else:
@@ -211,6 +219,10 @@ class ContourNode:
         return a * (6*b**2 - 6*a*b + 6*b + 2*a**2 - 3*a + 1) / 6
 
     def is_atomic_square(self, parent_contour):
+        if len(parent_contour) == 4:
+            return True
+        else:
+            return False
         for v in parent_contour.contour:
             index_curr_v = np.where(parent_contour.contour == v)[0][0]
             prev_v = parent_contour[index_curr_v - 1]

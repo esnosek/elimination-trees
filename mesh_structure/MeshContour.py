@@ -92,7 +92,11 @@ class MeshContour:
             else:
                 curr_index = curr_index + 1
         contour1, contour2 = self.__slice_contour(new_slice_vertices)
-        return MeshContour(contour1, self.mesh), MeshContour(contour2, self.mesh) 
+        contour1 = self.remove_useless_vertex(contour1)        
+        contour2 = self.remove_useless_vertex(contour2)
+        contour1 = MeshContour(contour1, self.mesh)
+        contour2 = MeshContour(contour2, self.mesh)
+        return contour1, contour2
                 
     def __add_vertices_beetween_two_vertex(self, list, v1, v2):
         vector_direction = self.__get_vector_direction(v1, v2)
@@ -249,5 +253,30 @@ class MeshContour:
         countour_part_2 = self.contour[:(index_start_v)]
         countour_part_3 = self.contour[(index_end_v + 1):]
         countour_part_2 = np.append(countour_part_2, new_slice_vertices)
-        new_contour_2 = np.append(countour_part_2, countour_part_3)
+        new_contour_2 = np.append(countour_part_2, countour_part_3)  
         return new_contour_1, new_contour_2      
+        
+    def remove_useless_vertex(self, contour):
+        vertex_to_remove = []
+        for v in contour:
+            index_v = np.where(contour == v)[0][0]
+            if index_v == 0:
+                prev_v = contour[len(contour) - 1]
+            else:
+                prev_v = contour[index_v - 1]
+            if index_v == len(contour) - 1:
+                next_v = contour[0]
+            else:
+                next_v = contour[index_v + 1]
+            inside_directions =  self.get_inside_directions(prev_v,v,next_v)
+            if len(inside_directions) != 1:
+                continue
+            existing_directions = v.get_existing_edge_directions()
+            possible_directions = list(set(inside_directions).intersection(existing_directions))
+            if len(possible_directions) == 0:
+                vertex_to_remove.append(v)
+        for v in vertex_to_remove:
+            index_v = np.where(contour == v)[0][0]
+            contour = np.delete(contour, index_v)
+        return contour
+        
