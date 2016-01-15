@@ -9,3 +9,5 @@ QTextCursor::setPosition: Position '25257' out of range
 QTextCursor::setPosition: Position '10982' out of range
 QTextCursor::setPosition: Position '10982' out of range
 QTextCursor::setPosition: Position '26574' out of range
+QInotifyFileSystemWatcherEngine::addPaths: inotify_add_watch failed: Nie ma takiego pliku ani katalogu
+QFileSystemWatcher: failed to add paths: /root/inzynierka/elimination_trees/elimination_trees

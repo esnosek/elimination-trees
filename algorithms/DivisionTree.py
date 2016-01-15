@@ -8,12 +8,8 @@ import tree_view.meshDrawer as md
 
 all_countours = bt.FastRBTree()
 optimal_tree_nodes = bt.FastRBTree()
-counter = 0
-all_contour_counter = 1
-ilosc_rozwiazan = 1
 root = None
 root_contour_node = None
-global_mesh = None
 node_id = 0
 division_counter = 0
 optimal_tree_counter = 1
@@ -23,21 +19,11 @@ def start(mesh):
     global all_countours
     global root
     global root_contour_node
-    global global_mesh
-    global_mesh = mesh
     root_contour_node = ContourNode(mesh.contour, None)
     all_countours[root_contour_node.contour.hash_key] = np.array([root_contour_node])
     root_contour_node.generate_all_children_division_nodes()
     root_contour_node.set_lowest_cost()
     root = create_optimal_tree(root_contour_node)
-    print("wszystkie podziały ", division_counter)
-    print("optymalne drzewa ", optimal_tree_counter)
-    #md.draw_leaf(mesh, root.children[0].child2.children[0], 'h')
-    
-#    i = 1
-#        file_name = "podzial" + str(i)
-#        i += 1
-#        md.draw_contour_with_interior_and_slice_from_division_node(mesh, d, file_name)
 
 def create_optimal_tree(contour_node):
     global optimal_tree_counter
@@ -241,34 +227,49 @@ class DivisionNode:
         self.path = path
         self.parent_contour_node = parent_contour_node
         new_contour1, new_contour2 = parent_contour_node.contour.slice_contour(path)
-        
-        self.contour_node_1 = ContourNode(new_contour1, self)
-        if is_in_all_contours(self.contour_node_1):
-            existing_contour_node = get_from_all_contours(self.contour_node_1)
-            self.contour_node_1 = existing_contour_node
-                
-        self.contour_node_2 = ContourNode(new_contour2, self)
-        if is_in_all_contours(self.contour_node_2):
-            existing_contour_node = get_from_all_contours(self.contour_node_2)
-            self.contour_node_2 = existing_contour_node
-        
+        self.contour_node_1 = self.create_contour_node(new_contour1)
+        self.contour_node_2 = self.create_contour_node(new_contour2)
         self.cost = None
+
+    def create_contour_node(self, contour):
+        if self.is_in_all_contours(contour):
+            existing_contour_node = self.get_from_all_contours(contour)
+            return existing_contour_node
+        else:
+            return ContourNode(contour, self)
+            
+    def get_from_all_contours(self, contour):
+        contour_hash_key = contour.hash_key
+        if contour_hash_key in all_countours:
+            for contour_node in all_countours[contour_hash_key]:
+                if contour_node.contour == contour:
+                    return contour_node
+        return False
+            
+    def is_in_all_contours(self, contour):
+        contour_hash_key = contour.hash_key
+        if contour_hash_key in all_countours:
+            for contour_node in all_countours[contour_hash_key]:
+                if contour_node.contour == contour:
+                    return True
+        return False       
 
 class DivisionTreeTests(unittest.TestCase):
 
     def test_cut(self):
         global all_countours
-        global counter
         mesh = create_mesh()
         start(mesh)
-        print("ilość unikalnych hashcodów: ", len(all_countours))
-        print("ilosc wszystkich kontorów: ", all_contour_counter)
-        print(ilosc_rozwiazan)
-        
-        clear_tmp()        
-        tree_string = create_tree_string(mesh, root)
-        tree_string += ';'
-        md.draw_tree(tree_string)
+        print("")
+        print("wszystkie kontury: ", all_contour_counter)
+        print("unikalne hashcody: ", len(all_countours))
+        print("wszystkie podziały ", division_counter)
+        print("optymalne drzewa ", optimal_tree_counter)
+
+#        clear_tmp()        
+#        tree_string = create_tree_string(mesh, root)
+#        tree_string += ';'
+#        md.draw_tree(tree_string)
 
 if __name__ == '__main__':
     unittest.main()

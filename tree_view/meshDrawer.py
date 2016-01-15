@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from ete3 import Tree, faces, TreeStyle
 
-plt.figure(figsize=(6,6))
+#plt.figure(figsize=(6,6))
 counter = 1
 
 used_vertices = {}

@@ -1,12 +1,12 @@
 import mesh_structure.list_numpy as ln
 import time
 import tree_view.meshDrawer as md
-from mesh_structure.Direction import Direction
+
 #fileName = "mesh_tests/test_kwadracik"
 #fileName = "mesh_tests/test1"
 #fileName = "mesh_tests/zwykla_siatka_4x4"
-fileName = "mesh_tests/edge"
-#fileName = "mesh_tests/test2"
+#fileName = "mesh_tests/edge"
+fileName = "mesh_tests/test1"
 #fileName = "mesh_tests/edge"
 
 def create_mesh(fileName=fileName):
