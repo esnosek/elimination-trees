@@ -5,6 +5,7 @@ from ete3 import Tree, faces, TreeStyle
 
 plt.figure(figsize=(6,6))
 counter = 1
+node_id = 0
 
 used_vertices = {}
 contour = None
@@ -13,7 +14,7 @@ contour = None
 def draw_tree_node(root_node):
     global counter
     fig, ax = plt.subplots(200, 1)
-    from algorithms.DivisionTree import TreeLeaf
+    from algorithms.DivisionsTree import TreeLeaf
     while root_node is not TreeLeaf:
         draw_contour_from_optimal_tree(root_node.contour, 'k', ax)
         counter += 1
@@ -145,11 +146,38 @@ def draw_table():
     plt.axis([0, 9, 0, 9])
     i = 1
     while i <= 9:
-        plt.plot([i,i], [0,9], 'k', linewidth=2.0)
-        plt.plot([0,9], [i,i], 'k', linewidth=2.0)
+        plt.plot([i, i], [0, 9], 'k', linewidth=2.0)
+        plt.plot([0, 9], [i, i], 'k', linewidth=2.0)
         i += 1
     plt.savefig("tabelka.png")
 
+
+def create_tree_string(mesh, node):
+    global node_id
+    from algorithms.DivisionsTree import TreeNode
+    if type(node) is TreeNode:
+        node_id += 1
+        my_id = node_id
+        draw_contour_with_interior_and_slice(mesh, node.children[0], 'tmp/%s.png' % node_id, node.cost)
+        c1_str = create_tree_string(mesh, node.children[0].child1)
+        c2_str = create_tree_string(mesh, node.children[0].child2)
+        return '(' + c1_str + ',' + c2_str + ')' + str(my_id)
+    else:
+        node_id += 1
+        draw_leaf(mesh, node, 'tmp/%s.png' % node_id, node.cost)
+        return str(node_id)
+
+
+def clear_tmp():
+    import os
+    folder = 'tmp'
+    for the_file in os.listdir(folder):
+        file_path = os.path.join(folder, the_file)
+        try:
+            if os.path.isfile(file_path):
+                os.unlink(file_path)
+        except e:
+            print(e)
 
 def draw_tree(tree_string):
     
