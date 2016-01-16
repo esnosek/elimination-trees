@@ -2,28 +2,31 @@ import matplotlib.pyplot as plt
 import numpy as np
 from ete3 import Tree, faces, TreeStyle
 
-#plt.figure(figsize=(6,6))
+
+plt.figure(figsize=(6,6))
 counter = 1
 
 used_vertices = {}
 contour = None
 
+
 def draw_tree_node(root_node):
     global counter
-    fig, ax = plt.subplots(200,1)
+    fig, ax = plt.subplots(200, 1)
     from algorithms.DivisionTree import TreeLeaf
     while root_node is not TreeLeaf:
         draw_contour_from_optimal_tree(root_node.contour, 'k', ax)
         counter += 1
         draw_tree_node(root_node.child1)
         draw_tree_node(root_node.child2)
-    
+
 
 def draw_mesh(mesh, colour, file_name):
-    for key in mesh.edge_list.edge_tree:
-        edge = mesh.edge_list.edge_tree[key]
+    for key in mesh.edge_list.edges:
+        edge = mesh.edge_list.edges[key]
         plt.plot([edge.v1.x, edge.v2.x], [edge.v1.y, edge.v2.y], colour)
     plt.savefig(file_name)
+
 
 def draw_contour_from_optimal_tree(vertex_list, colour, ax):
     global counter
@@ -39,6 +42,7 @@ def draw_contour_from_optimal_tree(vertex_list, colour, ax):
         ax[counter].plot([v1.x, v2.x], [v1.y, v2.y], colour)
     plt.show()
 
+
 def draw_leaf(mesh, tree_leaf, file_name, cost):
     plt.clf()
     #plt.axis([mesh.min_x, mesh.max_x, mesh.min_y, mesh.max_y])
@@ -47,6 +51,7 @@ def draw_leaf(mesh, tree_leaf, file_name, cost):
     draw_mesh(mesh, 'k', "do_usuniecia")
     draw_contour(tree_leaf.contour, 'k')
     plt.savefig(file_name)
+
 
 def draw_contour_with_interior_and_slice(mesh, tree_node_child, file_name, cost):
     plt.clf()
@@ -67,7 +72,8 @@ def draw_contour_with_interior_and_slice_from_division_node(mesh, division_node,
     draw_contour_interior(division_node.parent_contour_node.contour, 'k')
     draw_slice(division_node.path, 'r')
     plt.savefig(file_name)
-    
+
+
 def draw_slice(slice_vertices, colour):
     last_index = len(slice_vertices) - 1
     curr_index = 0
@@ -126,13 +132,12 @@ def visit_node(v, contour, colour):
         plt.plot([v.x, v2.x], [v.y, v2.y], colour, linewidth=2.0)
         if not (v2.x, v2.y) in used_vertices:
             visit_node(v2, contour, colour)
-  
-    
+
 
 def draw_slice_and_contour(mesh, tree_node, file_name='tmp.png'):
     for child in tree_node.children:
         draw_slice(mesh, child.path, 'r')
-    draw_contour(mesh, tree_node.contour.contour, 'k')   
+    draw_contour(mesh, tree_node.contour.contour, 'k')
     plt.savefig(file_name)
 
 
@@ -140,11 +145,12 @@ def draw_table():
     plt.axis([0, 9, 0, 9])
     i = 1
     while i <= 9:
-        plt.plot([i,i],[0,9], 'k', linewidth=2.0)
-        plt.plot([0,9],[i,i], 'k', linewidth=2.0)
+        plt.plot([i,i], [0,9], 'k', linewidth=2.0)
+        plt.plot([0,9], [i,i], 'k', linewidth=2.0)
         i += 1
     plt.savefig("tabelka.png")
-    
+
+
 def draw_tree(tree_string):
     
     t = Tree(tree_string, format=8)

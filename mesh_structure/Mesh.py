@@ -3,12 +3,12 @@
 import numpy as np
 from mesh_structure.MeshContour import MeshContour
 
+
 class Mesh:
 
-    def __init__(self, vertex_list, edge_list, face_list):
+    def __init__(self, vertex_list, edge_list):
         self.vertex_list = vertex_list
         self.edge_list = edge_list
-        self.face_list = face_list
         self.lower_left_vertex = self.__get_lower_left_vertex()
         self.upper_left_vertex = self.__get_upper_left_vertex()
         self.upper_right_vertex = self.__get_upper_right_vertex()

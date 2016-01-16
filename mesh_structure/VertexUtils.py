@@ -1,12 +1,38 @@
-# -*- coding: utf-8 -*-
-
-import bintrees as bt
-import functools as f
-from mesh_structure.EdgeBunch import EdgeBunch
+from mesh_structure.EdgeUtils import EdgeBunch
 from mesh_structure.Direction import Direction
+import bintrees as bt
+import numpy as np
 
 
-@f.total_ordering
+class SortedVertexLists:
+
+    def __init__(self):
+        self.x_sorted = bt.FastRBTree()
+        self.y_sorted = bt.FastRBTree()
+
+    def __str__(self):
+        s = ""
+        for key in self.x_sorted:
+            vertex = self.x_sorted[key]
+            s = s + str(vertex) + "\n"
+        return s
+
+    def get_values(self, column):
+        list = np.array([], dtype=int)
+        for k in self.x_sorted.keys():
+            list = np.append(list, k[column])
+        return list
+
+    def get_vertex(self, key):
+        return self.x_sorted[key]
+
+    def get_max_x(self):
+        return max(self.x_sorted)[0]
+
+    def get_max_y(self):
+        return max(self.y_sorted)[0]
+
+
 class Vertex:
 
     def __init__(self, x, y):
@@ -16,7 +42,6 @@ class Vertex:
         self.right_edges = EdgeBunch(Direction.right)
         self.bottom_edges = EdgeBunch(Direction.bottom)
         self.left_edges = EdgeBunch(Direction.left)
-        self.face_incident_tree = bt.FastRBTree()
 
     def get_existing_edge_directions(self):
         existing_directions = []
@@ -37,7 +62,7 @@ class Vertex:
             return self.right_edges.get_shortest_edge()
         elif direction == Direction.bottom:
             return self.bottom_edges.get_shortest_edge()
-        elif direction == Direction.left: 
+        elif direction == Direction.left:
             return self.left_edges.get_shortest_edge()
 
     def get_longest_edge_in_direction(self, direction):
@@ -49,7 +74,7 @@ class Vertex:
             return self.bottom_edges.get_longest_edge()
         elif direction == Direction.left:
             return self.left_edges.get_longest_edge()
-            
+
     def add_incident_edge(self, edge):
         if edge.v1 == self:
             v = edge.v2
@@ -94,10 +119,6 @@ class Vertex:
 
     def remove_left_edges(self):
         del self.left_edges
-        
-    def add_incident_face(self, f):
-        key = (f.level, f.id)
-        self.face_incident_tree.insert(key, f)
 
     def __str__(self):
         s = ("[" + str(self.x) + ", " + str(self.y) + "]")
@@ -119,3 +140,19 @@ class Vertex:
         elif self.y > other.y:
             return False
         return False
+
+
+sorted_vertex_lists = SortedVertexLists()
+
+
+def create_vertex(x, y):
+    global sorted_vertex_lists
+    v = Vertex(x, y)
+    key_x = (x, y)
+    key_y = (y, x)
+    if key_x in sorted_vertex_lists.x_sorted:
+        return sorted_vertex_lists.x_sorted[key_x]
+    else:
+        sorted_vertex_lists.x_sorted.insert(key_x, v)
+        sorted_vertex_lists.y_sorted.insert(key_y, v)
+    return v

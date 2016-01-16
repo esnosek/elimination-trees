@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import algorithms.CuttingUtils as cu
 import numpy as np
-from test import create_mesh
 import bintrees as bt
 import unittest
 import tree_view.meshDrawer as md
@@ -13,7 +12,7 @@ root_contour_node = None
 node_id = 0
 division_counter = 0
 optimal_tree_counter = 1
-
+all_contour_counter = 0
 
 def start(mesh):
     global all_countours
@@ -257,19 +256,7 @@ class DivisionNode:
 class DivisionTreeTests(unittest.TestCase):
 
     def test_cut(self):
-        global all_countours
-        mesh = create_mesh()
-        start(mesh)
-        print("")
-        print("wszystkie kontury: ", all_contour_counter)
-        print("unikalne hashcody: ", len(all_countours))
-        print("wszystkie podziały ", division_counter)
-        print("optymalne drzewa ", optimal_tree_counter)
-
-#        clear_tmp()        
-#        tree_string = create_tree_string(mesh, root)
-#        tree_string += ';'
-#        md.draw_tree(tree_string)
+        pass
 
 if __name__ == '__main__':
     unittest.main()
