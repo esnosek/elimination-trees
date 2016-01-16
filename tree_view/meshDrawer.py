@@ -4,20 +4,15 @@ from ete3 import Tree, faces, TreeStyle
 
 
 plt.figure(figsize=(6,6))
-counter = 1
 node_id = 0
-
 used_vertices = {}
-contour = None
 
 
 def draw_tree_node(root_node):
-    global counter
     fig, ax = plt.subplots(200, 1)
     from algorithms.DivisionsTree import TreeLeaf
     while root_node is not TreeLeaf:
         draw_contour_from_optimal_tree(root_node.contour, 'k', ax)
-        counter += 1
         draw_tree_node(root_node.child1)
         draw_tree_node(root_node.child2)
 
@@ -51,18 +46,6 @@ def draw_leaf(mesh, tree_leaf, file_name, cost):
     plt.gcf().subplots_adjust(bottom=0.30)
     draw_mesh(mesh, 'k', "do_usuniecia")
     draw_contour(tree_leaf.contour, 'k')
-    plt.savefig(file_name)
-
-
-def draw_contour_with_interior_and_slice(mesh, tree_node_child, file_name, cost):
-    plt.clf()
-    #plt.axis([mesh.min_x, mesh.max_x, mesh.min_y, mesh.max_y])
-    plt.xlabel(int(cost), fontsize=110)
-    plt.gcf().subplots_adjust(bottom=0.30)
-    draw_mesh(mesh, 'k', "do_usuniecia")
-    draw_contour(tree_node_child.contour, 'k')
-    draw_contour_interior(tree_node_child.contour, 'k')
-    draw_slice(tree_node_child.path, 'r')
     plt.savefig(file_name)
 
 
@@ -135,27 +118,10 @@ def visit_node(v, contour, colour):
             visit_node(v2, contour, colour)
 
 
-def draw_slice_and_contour(mesh, tree_node, file_name='tmp.png'):
-    for child in tree_node.children:
-        draw_slice(mesh, child.path, 'r')
-    draw_contour(mesh, tree_node.contour.contour, 'k')
-    plt.savefig(file_name)
-
-
-def draw_table():
-    plt.axis([0, 9, 0, 9])
-    i = 1
-    while i <= 9:
-        plt.plot([i, i], [0, 9], 'k', linewidth=2.0)
-        plt.plot([0, 9], [i, i], 'k', linewidth=2.0)
-        i += 1
-    plt.savefig("tabelka.png")
-
-
 def create_tree_string(mesh, node):
     global node_id
-    from algorithms.DivisionsTree import TreeNode
-    if type(node) is TreeNode:
+    from algorithms.OptimalEliminationTries import OptimalTreeContourNode
+    if type(node) is OptimalTreeContourNode:
         node_id += 1
         my_id = node_id
         draw_contour_with_interior_and_slice(mesh, node.children[0], 'tmp/%s.png' % node_id, node.cost)
@@ -167,6 +133,17 @@ def create_tree_string(mesh, node):
         draw_leaf(mesh, node, 'tmp/%s.png' % node_id, node.cost)
         return str(node_id)
 
+
+def draw_contour_with_interior_and_slice(mesh, tree_node_child, file_name, cost):
+    plt.clf()
+    #plt.axis([mesh.min_x, mesh.max_x, mesh.min_y, mesh.max_y])
+    plt.xlabel(int(cost), fontsize=110)
+    plt.gcf().subplots_adjust(bottom=0.30)
+    draw_mesh(mesh, 'k', "do_usuniecia")
+    draw_contour(tree_node_child.contour, 'k')
+    draw_contour_interior(tree_node_child.contour, 'k')
+    draw_slice(tree_node_child.path, 'r')
+    plt.savefig(file_name)
 
 def clear_tmp():
     import os

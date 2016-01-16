@@ -5,15 +5,11 @@ import bintrees as bt
 import unittest
 
 all_countours = bt.FastRBTree()
-root = None
-root_contour_node = None
 division_counter = 0
 all_contour_counter = 0
 
 def create_all_divisions_tree(mesh):
     global all_countours
-    global root
-    global root_contour_node
     root_contour_node = ContourNode(mesh.contour, None)
     all_countours[root_contour_node.contour.hash_key] = np.array([root_contour_node])
     root_contour_node.generate_all_children_division_nodes()
@@ -52,28 +48,7 @@ def is_in_all_contours(contour):
             if contour_node.contour == contour:
                 return True
     return False   
-        
-class TreeNode:
-    
-    def __init__(self, cost):
-        self.children = []
-        self.cost = cost
-        
-    def add_child(self, child1, child2, contour, path):
-        self.children.append(TreeNodeChild(child1, child2, contour, path))
 
-class TreeNodeChild:
-    def __init__(self, child1, child2, contour, path):
-        self.contour = contour
-        self.child1 = child1
-        self.child2 = child2
-        self.path = path
-        
-class TreeLeaf:
-
-    def __init__(self, contour, cost):
-        self.contour = contour
-        self.cost = cost
     
 class ContourNode:
 
