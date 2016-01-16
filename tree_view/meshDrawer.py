@@ -136,7 +136,6 @@ def create_tree_string(mesh, node):
 
 def draw_contour_with_interior_and_slice(mesh, tree_node_child, file_name, cost):
     plt.clf()
-    #plt.axis([mesh.min_x, mesh.max_x, mesh.min_y, mesh.max_y])
     plt.xlabel(int(cost), fontsize=110)
     plt.gcf().subplots_adjust(bottom=0.30)
     draw_mesh(mesh, 'k', "do_usuniecia")

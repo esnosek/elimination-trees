@@ -11,39 +11,42 @@ fileName = "mesh_tests/edge"
 
 
 def create_mesh(fileName=fileName):
-    mesh = load_file(fileName)
-    mesh = add_points(mesh)
-    return create_mesh_structure(mesh)
+    mesh_table = load_file(fileName)
+    mesh_table = add_points(mesh_table)
+    return create_mesh_structure(mesh_table)
 
 
 def find_all_divisions_tree(mesh):
     return dt.create_all_divisions_tree(mesh)
 
+
 def create_optimal_elimination_tries(root_contour_node):
     return oet.create_optimal_elimination_tries(root_contour_node)
+
 
 def load_file(path):
     return np.loadtxt(path, dtype='int', skiprows=2)
 
 
-def add_points(mesh):
-    mesh = np.append(mesh, mesh[:, [2, 5]], 1)
-    mesh = np.append(mesh, mesh[:, [4, 3]], 1)
-    return mesh[:, np.array([0, 1, 2, 3, 6, 7, 4, 5, 8, 9])]
+def add_points(mesh_table):
+    mesh_table = np.append(mesh_table, mesh_table[:, [2, 5]], 1)
+    mesh_table = np.append(mesh_table, mesh_table[:, [4, 3]], 1)
+    return mesh_table[:, np.array([0, 1, 2, 3, 6, 7, 4, 5, 8, 9])]
 
 
-def create_mesh_structure(mesh):
-    for row in mesh:
-        v1 = vu.create_vertex(row[2], row[3])
-        v2 = vu.create_vertex(row[4], row[5])
-        v3 = vu.create_vertex(row[6], row[7])
-        v4 = vu.create_vertex(row[8], row[9])
-        eu.create_edge(v1, v2)  # kolejnosc wazna: v1 < v2
-        eu.create_edge(v1, v4)  # kolejnosc wazna: v1 < v4
-        eu.create_edge(v2, v3)  # kolejnosc wazna: v2 < v3
-        eu.create_edge(v4, v3)  # kolejnosc wazna: v4 < v3
-
-    return m.Mesh(vu.sorted_vertex_lists, eu.sorted_edge_list)
+def create_mesh_structure(mesh_table):
+    mesh = m.Mesh()
+    for row in mesh_table:
+        v1 = mesh.create_vertex(row[2], row[3])
+        v2 = mesh.create_vertex(row[4], row[5])
+        v3 = mesh.create_vertex(row[6], row[7])
+        v4 = mesh.create_vertex(row[8], row[9])
+        mesh.create_edge(v1, v2)
+        mesh.create_edge(v1, v4)
+        mesh.create_edge(v2, v3)
+        mesh.create_edge(v4, v3)
+    mesh.create_mesh_contour()
+    return mesh
 
 
 start_time = int(round(time.time() * 100000))
@@ -58,10 +61,10 @@ print("unikalne hashcody: ", len(dt.all_countours))
 print("wszystkie podziały ", dt.division_counter)
 print("optymalne drzewa ", oet.optimal_tree_counter)
 
-md.clear_tmp()
-tree_string = md.create_tree_string(mesh, root_elimination_tree)
-tree_string += ';'
-md.draw_tree(tree_string)
+#md.clear_tmp()
+#tree_string = md.create_tree_string(mesh, root_elimination_tree)
+#tree_string += ';'
+#md.draw_tree(tree_string)
 
 end_time = int(round(time.time() * 100000))
 print('czas: ' + str((end_time - start_time)/100000) + 's')

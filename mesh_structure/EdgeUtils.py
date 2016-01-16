@@ -3,10 +3,19 @@ import bintrees as bt
 
 class Edge:
     def __init__(self, v1, v2):
-        # trzeba zadbac zeby v1 < v2
-        self.v1 = v1
-        self.v2 = v2
+        if v1 < v2:
+            self.v1 = v1
+            self.v2 = v2
+        else:
+            self.v1 = v2
+            self.v2 = v1
         self.length = self.__set_length()
+        
+    def get_second_edge_vertex(self, first_vertex):
+        if self.v1 == first_vertex:
+            return self.v2
+        else:
+            return self.v1
 
     def __set_length(self):
         if (self.v1.x == self.v2.x):
@@ -42,22 +51,6 @@ class SortedEdgeList:
 
     def get_edge(self, key):
         return self.edges[key]
-
-
-sorted_edge_list = SortedEdgeList()
-
-
-def create_edge(v1, v2):
-    global sorted_edge_list
-    e = Edge(v1, v2)
-    key = (v1.x, v1.y, v2.x, v2.y)
-    if key in sorted_edge_list.edges:
-        return sorted_edge_list.edges[key]
-    else:
-        v1.add_incident_edge(e)
-        v2.add_incident_edge(e)
-        sorted_edge_list.edges.insert(key, e)
-    return e
 
 
 class EdgeBunch:

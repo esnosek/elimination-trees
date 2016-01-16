@@ -1,13 +1,14 @@
+import numpy as np
+
 optimal_tree_counter = 1
 
 
 def create_optimal_elimination_tries(contour_node):
     global optimal_tree_counter
-    if contour_node.is_atomic_square(contour_node.contour):
+    if contour_node.contour.is_atomic_square():
         return OptimalTreeLeaf(contour_node.contour, contour_node.lowest_cost)
     lowest_cost_divisions = contour_node.get_divisions_with_lowest_cost()
     optimal_tree_contour_node = OptimalTreeContourNode(contour_node.lowest_cost)
-    optimal_tree_counter = optimal_tree_counter + len(lowest_cost_divisions)-1
     for division in lowest_cost_divisions:
         child_1 = create_optimal_elimination_tries(division.contour_node_1)
         child_2 = create_optimal_elimination_tries(division.contour_node_2)
@@ -18,11 +19,11 @@ def create_optimal_elimination_tries(contour_node):
 class OptimalTreeContourNode:
 
     def __init__(self, cost):
-        self.children = []
+        self.children = np.empty(dtype=object, shape=0)
         self.cost = cost
-        
+
     def add_child(self, child1, child2, contour, path):
-        self.children.append(OptimalTreeDivisionNode(child1, child2, contour, path))
+        self.children = np.append(self.children, OptimalTreeDivisionNode(child1, child2, contour, path))
 
 
 class OptimalTreeDivisionNode:

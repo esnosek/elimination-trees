@@ -140,19 +140,3 @@ class Vertex:
         elif self.y > other.y:
             return False
         return False
-
-
-sorted_vertex_lists = SortedVertexLists()
-
-
-def create_vertex(x, y):
-    global sorted_vertex_lists
-    v = Vertex(x, y)
-    key_x = (x, y)
-    key_y = (y, x)
-    if key_x in sorted_vertex_lists.x_sorted:
-        return sorted_vertex_lists.x_sorted[key_x]
-    else:
-        sorted_vertex_lists.x_sorted.insert(key_x, v)
-        sorted_vertex_lists.y_sorted.insert(key_y, v)
-    return v

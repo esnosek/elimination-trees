@@ -44,6 +44,11 @@ class MeshContour:
             to_str += str(v)
         return to_str
         
+    def is_atomic_square(self):
+        if len(self.contour) == 4:
+            return True
+        return False
+         
     def get_max_x(self):
         max_x = self.contour[0].x
         for v in self.contour:
@@ -142,7 +147,7 @@ class MeshContour:
 
     def __add_vertices_from_top_directed_vector(self, list, v1, v2):
         # krawedz skierowana w gore, wiec v1 < v2
-        vertices_beetween = self.mesh.vertex_list.x_sorted[(v1.x, v1.y):(v2.x, v2.y)]
+        vertices_beetween = self.mesh.sorted_vertex_lists.x_sorted[(v1.x, v1.y):(v2.x, v2.y)]
         for key in vertices_beetween:
             vertex = vertices_beetween[key]
             if vertex != v1 and vertex != v2:
@@ -151,7 +156,7 @@ class MeshContour:
 
     def __add_vertices_from_right_directed_vector(self, list, v1, v2):
         # krawedz skierowana w prawo, wiec v1 < v2
-        vertices_beetween = self.mesh.vertex_list.y_sorted[(v1.y, v1.x):(v2.y, v2.x)]
+        vertices_beetween = self.mesh.sorted_vertex_lists.y_sorted[(v1.y, v1.x):(v2.y, v2.x)]
         for key in vertices_beetween:
             vertex = vertices_beetween[key]
             if vertex != v1 and vertex != v2:
@@ -160,7 +165,7 @@ class MeshContour:
 
     def __add_vertices_from_bottom_directed_vector(self, list, v1, v2):
         # krawedz skierowana w dół, wiec v1 > v2
-        vertices_beetween = self.mesh.vertex_list.x_sorted[(v2.x, v2.y):(v1.x, v1.y)]
+        vertices_beetween = self.mesh.sorted_vertex_lists.x_sorted[(v2.x, v2.y):(v1.x, v1.y)]
         size_of_slice_vertices = list.size
         for key in vertices_beetween:
             vertex = vertices_beetween[key]
@@ -170,7 +175,7 @@ class MeshContour:
 
     def __add_vertices_from_left_directed_vector(self, list, v1, v2):
         # krawedz skierowana w lewo, wiec v1 > v2
-        vertices_beetween = self.mesh.vertex_list.y_sorted[(v2.y, v2.x):(v1.y, v1.x)]
+        vertices_beetween = self.mesh.sorted_vertex_lists.y_sorted[(v2.y, v2.x):(v1.y, v1.x)]
         size_of_slice_vertices = list.size
         for key in vertices_beetween:
             vertex = vertices_beetween[key]
