@@ -1,0 +1,13 @@
+edge poziom 2
+wszystkie kontury:  207
+unikalne hashcody:  196
+wszystkie drzewa eliminacji  76091
+optymalne drzewa  4
+czas: 3.29616s
+
+edge poziom 3
+wszystkie kontury:  29681
+unikalne hashcody:  14115
+wszystkie drzewa eliminacji  778440098107854
+optymalne drzewa  16
+czas: 2780.9067s

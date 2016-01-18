@@ -2,77 +2,70 @@
 from mesh_structure.Direction import Direction
 from copy import copy
 
+possible_paths = []
+end_vertices_list = []
+contour = None
 
-def get_possible_cuts(contour):
+def get_possible_paths(c):
+    global possible_paths
+    global end_vertices_list
+    global contour
+    contour = c
     possible_paths = []
-    for point_a_idx in range(len(contour.contour)):
-        for point_b_idx in range(point_a_idx + 1, len(contour.contour)):
-            point_a = contour.contour[point_a_idx]
-            point_b = contour.contour[point_b_idx]
-            
-            inside_directions =  contour.get_inside_directions(contour[point_a_idx - 1],
-                                                               point_a, 
-                                                               contour[point_a_idx + 1])
-                                                               
-            existing_directions = point_a.get_existing_edge_directions()
-            
-            possible_directions = list(set(inside_directions).intersection(existing_directions))
-            
-            if len(inside_directions) > 0:
-                for d in possible_directions:
-                    inside_edge = point_a.get_longest_edge_in_direction(d)
-                    used_cross_points = [point_a]
-                    second_point_a = inside_edge.get_second_edge_vertex(point_a)
-
-                    find_path(second_point_a, [point_b], d.get_oposite_direction(), used_cross_points, possible_paths, contour.contour_index)
-
-               
+    for index_start_v in range(len(contour)):
+        for index_end_v in range(index_start_v + 1, len(contour)):
+            start_v = contour[index_start_v]
+            end_v = contour[index_end_v]
+            end_vertices_list = [end_v]
+            possible_directions = contour.get_possible_inside_directions(start_v)
+            if len(possible_directions) > 0:
+                for direction in possible_directions:
+                    travel_vertex = travel_to_next_vertex(start_v, direction)
+                    used_cross_vertices = [start_v]
+                    find_path(travel_vertex, direction.get_oposite_direction(), used_cross_vertices)
     return possible_paths
 
 
-def find_path(current_point, end_point_list, arrival_direction, used_cross_points, possible_paths, contour_index):
+def find_path(curr_v, arrival_direction, used_cross_vertices):
+    global possible_paths
+    global end_vertices_list
+    global contour
 
-    if current_point in end_point_list:
-        used_cross_points = copy_used_points_list_and_append(current_point, used_cross_points)
-        possible_paths.append(used_cross_points)    
+    if curr_v in end_vertices_list:
+        used_cross_vertices = copy_used_vertices_list_and_append(curr_v, used_cross_vertices)
+        possible_paths.append(used_cross_vertices)    
         return True
         
-    elif current_point in used_cross_points or (current_point.x, current_point.y) in contour_index:
+    elif curr_v in used_cross_vertices or curr_v in contour:
         return False
 
-    elif is_there_any_way(current_point, arrival_direction, contour_index):
-        
-        possible_travel_directions = get_possible_directions(current_point, arrival_direction)     
-        used_cross_points = copy_used_points_list_and_append(current_point, used_cross_points)
-            
-        is_current_useful = False
-
+    elif is_there_any_way(curr_v, arrival_direction):
+        possible_travel_directions = get_possible_travel_directions(curr_v, arrival_direction)     
+        used_cross_vertices = copy_used_vertices_list_and_append(curr_v, used_cross_vertices)
+        is_curr_v_useful = False
         for direction in possible_travel_directions:
-
-            travel_point = travel_to_next_point(current_point, direction)
-
-            if find_path(travel_point, end_point_list, direction.get_oposite_direction(), used_cross_points, possible_paths, contour_index):
-                is_current_useful = True
-
-        return is_current_useful
-
+            travel_vertex = travel_to_next_vertex(curr_v, direction)
+            if find_path(travel_vertex, direction.get_oposite_direction(), used_cross_vertices):
+                is_curr_v_useful = True
+        return is_curr_v_useful
     else:
         return False
-        
-def copy_used_points_list_and_append(point, used_points):
-    used_points_copy = copy(used_points)
-    used_points_copy.append(point)
-    return used_points_copy
 
 
-def travel_to_next_point(current_point, direction):
-    travel_edge = current_point.get_longest_edge_in_direction(direction)
-    travel_point = travel_edge.get_second_edge_vertex(current_point)
-    return travel_point
+def copy_used_vertices_list_and_append(vertex, used_vertices):
+    used_vertices_copy = copy(used_vertices)
+    used_vertices_copy.append(vertex)
+    return used_vertices_copy
 
 
-def get_possible_directions(point, arrival_direction):
-    possible_directions = list(point.get_existing_edge_directions())
+def travel_to_next_vertex(v, direction):
+    travel_edge = v.get_longest_edge_in_direction(direction)
+    travel_vertex = travel_edge.get_second_vertex_from_edge(v)
+    return travel_vertex
+
+
+def get_possible_travel_directions(v, arrival_direction):
+    possible_directions = list(v.get_existing_edge_directions())
     if arrival_direction in [Direction.bottom, Direction.top]:
         if (Direction.left in possible_directions) and (Direction.right not in possible_directions):
             possible_directions.remove(Direction.left)
@@ -88,10 +81,11 @@ def get_possible_directions(point, arrival_direction):
     return possible_directions
 
 
-def is_there_any_way(point, arrival_direction, contour_index):
-    if (point.x, point.y) in contour_index:
+def is_there_any_way(v, arrival_direction):
+    global contour
+    if v in contour:
         return False
-    elif arrival_direction.get_oposite_direction() in point.get_existing_edge_directions():
+    elif arrival_direction.get_oposite_direction() in v.get_existing_edge_directions():
         return True
     else:
         return False

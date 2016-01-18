@@ -2,36 +2,26 @@
 
 import numpy as np
 from mesh_structure.Direction import Direction
-from numpy import mean
 
 class MeshContour:
 
     def __init__(self, contour, mesh):
         self.mesh = mesh
         self.contour = contour
+        self.__remove_useless_vertex()
         self.contour_index = self.__create_contour_index()
-        min_el = min(contour)
-        max_el = max(contour)
-        c_x_sum = 0
-        c_y_sum = 0
-        self.max_x = self.get_max_x()
-        self.min_x = self.get_min_x()
-        self.max_y = self.get_max_y()
-        self.min_y = self.get_min_y()        
-        for el in contour:
-            c_x_sum += el.x
-            c_y_sum += el.y
-        self.hash_key =  hash(((min_el.x, min_el.y), (c_x_sum, c_y_sum), (max_el.x, max_el.y)))      
+        self.max_x = self.__get_max_x()
+        self.min_x = self.__get_min_x()
+        self.max_y = self.__get_max_y()
+        self.min_y = self.__get_min_y()        
+        self.hash_key = self.__set_hash_key()
         
-    def __create_contour_index(self):
-        contour_index = {}
-        for v in self.contour:
-            contour_index[(v.x, v.y)] = v
-        return contour_index
-
     def __getitem__(self, index):
         return self.contour[index % len(self.contour)]
 
+    def __contains__(self, v):
+        return (v.x, v.y) in self.contour_index
+        
     def __len__(self):
         return len(self.contour)
         
@@ -43,65 +33,118 @@ class MeshContour:
         for v in self.contour:
             to_str += str(v)
         return to_str
+
+    def __remove_useless_vertex(self):
+        vertex_to_remove = []
+        for v in self.contour:
+            index_v = np.where(self.contour == v)[0][0]
+            prev_v = self[index_v - 1]
+            next_v = self[index_v + 1]
+            inside_directions =  self.__get_inside_directions(prev_v,v,next_v)
+            if len(inside_directions) != 1:
+                continue
+            existing_directions = v.get_existing_edge_directions()
+            possible_directions = list(set(inside_directions).intersection(existing_directions))
+            if len(possible_directions) == 0:
+                vertex_to_remove.append(v)
+        for v in vertex_to_remove:
+            index_v = np.where(self.contour == v)[0][0]
+            self.contour = np.delete(self.contour, index_v)
+
+    def __create_contour_index(self):
+        contour_index = {}
+        for v in self.contour:
+            contour_index[(v.x, v.y)] = v
+        return contour_index
         
-    def is_atomic_square(self):
-        if len(self.contour) == 4:
-            return True
-        return False
-         
-    def get_max_x(self):
+    def __set_hash_key(self):
+        min_el = min(self.contour)
+        max_el = max(self.contour)
+        c_x_sum = 0
+        c_y_sum = 0
+        for el in self.contour:
+            c_x_sum += el.x
+            c_y_sum += el.y
+        hash_key = hash(((min_el.x, min_el.y), (c_x_sum, c_y_sum), (max_el.x, max_el.y)))  
+        return hash_key
+
+    def __get_max_x(self):
         max_x = self.contour[0].x
         for v in self.contour:
             if v.x > max_x:
                 max_x = v.x
         return max_x
 
-    def get_min_x(self):
+    def __get_min_x(self):
         min_x = self.contour[0].x
         for v in self.contour:
             if v.x < min_x:
                 min_x = v.x
         return min_x
 
-    def get_max_y(self):
+    def __get_max_y(self):
         max_y = self.contour[0].y
         for v in self.contour:
             if v.y > max_y:
                 max_y = v.y
         return max_y
 
-    def get_min_y(self):
+    def __get_min_y(self):
         min_y = self.contour[0].y
         for v in self.contour:
             if v.y < min_y:
                 min_y = v.y
         return min_y
-    
-    def get_center(self):
-        return tuple(map(mean, zip(*self.contour)))
         
-    def slice_contour(self, slice_vertices):
-        new_slice_vertices = np.empty(dtype=object, shape=0)
-        last_index = len(slice_vertices) - 1
+    def is_atomic_square(self):
+        if len(self.contour) == 4:
+            return True
+        return False
+
+    def get_possible_inside_directions(self, v):
+        index_v = np.where(self.contour == v)[0][0]
+        prev_v = self[index_v - 1]
+        next_v = self[index_v + 1]
+        inside_directions =  self.__get_inside_directions(prev_v, v, next_v)
+        existing_directions = v.get_existing_edge_directions()
+        possible_directions = list(set(inside_directions).intersection(existing_directions))
+        return possible_directions
+            
+    def slice_contour(self, path):
+        new_path = self.__add_missing_vertices(path)
+        contour1, contour2 = self.__create_new_contours(new_path)
+        return contour1, contour2
+
+    def __add_missing_vertices(self, path):
+        new_path = np.empty(dtype=object, shape=0)
+        last_index = len(path) - 1
         curr_index = 1
-        prev_v = slice_vertices[curr_index - 1]
-        curr_v = slice_vertices[curr_index]
-        new_slice_vertices = np.append(new_slice_vertices, prev_v)
+        prev_v = path[curr_index - 1]
+        curr_v = path[curr_index]
+        new_path = np.append(new_path, prev_v)
         while True:
-            prev_v = slice_vertices[curr_index - 1]
-            curr_v = slice_vertices[curr_index]
-            new_slice_vertices = self.__add_vertices_beetween_two_vertex(new_slice_vertices, prev_v, curr_v)
-            new_slice_vertices = np.append(new_slice_vertices, curr_v)
+            prev_v = path[curr_index - 1]
+            curr_v = path[curr_index]
+            new_path = self.__add_vertices_beetween_two_vertex(new_path, prev_v, curr_v)
+            new_path = np.append(new_path, curr_v)
             if curr_index == last_index:
                 break
             else:
                 curr_index = curr_index + 1
-        contour1, contour2 = self.__slice_contour(new_slice_vertices)
-        contour1 = self.remove_useless_vertex(contour1)        
-        contour2 = self.remove_useless_vertex(contour2)
-        contour1 = MeshContour(contour1, self.mesh)
-        contour2 = MeshContour(contour2, self.mesh)
-        return contour1, contour2
+        return new_path 
+
+    def __create_new_contours(self, path):
+        start_v = path[0]
+        end_v = path[len(path) - 1]
+        index_start_v = np.where(self.contour == start_v)[0][0]
+        index_end_v = np.where(self.contour == end_v)[0][0]
+        countour_part_1 = self.contour[index_start_v + 1:index_end_v]
+        new_contour_1 = np.append(countour_part_1, path[::-1])
+        countour_part_2 = self.contour[:(index_start_v)]
+        countour_part_3 = self.contour[(index_end_v + 1):]
+        countour_part_2 = np.append(countour_part_2, path)
+        new_contour_2 = np.append(countour_part_2, countour_part_3)  
+        return MeshContour(new_contour_1, self.mesh), MeshContour(new_contour_2, self.mesh) 
                 
     def __add_vertices_beetween_two_vertex(self, list, v1, v2):
         vector_direction = self.__get_vector_direction(v1, v2)
@@ -183,7 +226,7 @@ class MeshContour:
                 list = np.insert(list, size_of_slice_vertices, vertex)
         return list
 
-    def get_inside_directions(self, prev_v, curr_v, next_v):
+    def __get_inside_directions(self, prev_v, curr_v, next_v):
         dir1 = self.__get_vector_direction(prev_v, curr_v)
         dir2 = self.__get_vector_direction(curr_v, next_v)
         if dir1 == Direction.top and dir2 == Direction.top:
@@ -246,42 +289,5 @@ class MeshContour:
         return [Direction.top, Direction.left]
 
     def __get_inside_directions_from_vertex_beetwen_left_and_left_vectors(self):
-        return [Direction.top]
-    
-    def __slice_contour(self, new_slice_vertices):
-        start_v = new_slice_vertices[0]
-        end_v = new_slice_vertices[len(new_slice_vertices) - 1]
-        index_start_v = np.where(self.contour == start_v)[0][0]
-        index_end_v = np.where(self.contour == end_v)[0][0]
-        countour_part_1 = self.contour[index_start_v + 1:index_end_v]
-        new_contour_1 = np.append(countour_part_1, new_slice_vertices[::-1])
-        countour_part_2 = self.contour[:(index_start_v)]
-        countour_part_3 = self.contour[(index_end_v + 1):]
-        countour_part_2 = np.append(countour_part_2, new_slice_vertices)
-        new_contour_2 = np.append(countour_part_2, countour_part_3)  
-        return new_contour_1, new_contour_2      
-        
-    def remove_useless_vertex(self, contour):
-        vertex_to_remove = []
-        for v in contour:
-            index_v = np.where(contour == v)[0][0]
-            if index_v == 0:
-                prev_v = contour[len(contour) - 1]
-            else:
-                prev_v = contour[index_v - 1]
-            if index_v == len(contour) - 1:
-                next_v = contour[0]
-            else:
-                next_v = contour[index_v + 1]
-            inside_directions =  self.get_inside_directions(prev_v,v,next_v)
-            if len(inside_directions) != 1:
-                continue
-            existing_directions = v.get_existing_edge_directions()
-            possible_directions = list(set(inside_directions).intersection(existing_directions))
-            if len(possible_directions) == 0:
-                vertex_to_remove.append(v)
-        for v in vertex_to_remove:
-            index_v = np.where(contour == v)[0][0]
-            contour = np.delete(contour, index_v)
-        return contour
+        return [Direction.top]    
         

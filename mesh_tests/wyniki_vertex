@@ -1,0 +1,62 @@
+vertex poziom 2
+wszystkie kontury:  39
+unikalne hashcody:  39
+wszystkie drzewa eliminacji  210
+optymalne drzewa  4
+czas: 0.22853s
+
+vertex poziom 3
+wszystkie kontury:  83
+unikalne hashcody:  83
+wszystkie drzewa eliminacji  5130
+optymalne drzewa  16
+czas: 0.79653s
+
+vertex poziom 4
+wszystkie kontury:  149
+unikalne hashcody:  149
+wszystkie drzewa eliminacji  135042
+optymalne drzewa  16
+czas: 2.00545s
+
+vertex poziom 5
+wszystkie kontury:  241
+unikalne hashcody:  241
+wszystkie drzewa eliminacji  3727002
+optymalne drzewa  128
+czas: 4.22853s
+
+vertex poziom 6
+wszystkie kontury:  363
+unikalne hashcody:  363
+wszystkie drzewa eliminacji  106396748
+optymalne drzewa  256
+czas: 8.23969s
+
+vertex poziom 7
+wszystkie kontury:  519
+unikalne hashcody:  519
+wszystkie drzewa eliminacji  3116576980
+optymalne drzewa  512
+czas: 14.7294s
+
+vertex poziom 8
+wszystkie kontury:  713
+unikalne hashcody:  713
+wszystkie drzewa eliminacji  93169003206
+optymalne drzewa  256
+czas: 24.57344s
+
+vertex poziom 9
+wszystkie kontury:  949
+unikalne hashcody:  949
+wszystkie drzewa eliminacji  2831650112762
+optymalne drzewa  4096
+czas: 39.03333s
+
+vertex poziom 10
+wszystkie kontury:  1231
+unikalne hashcody:  1231
+wszystkie drzewa eliminacji  87244612123692
+optymalne drzewa  16384
+czas: 58.62276s

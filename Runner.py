@@ -1,13 +1,11 @@
 import time
-import mesh_structure.VertexUtils as vu
-import mesh_structure.EdgeUtils as eu
-import mesh_structure.Mesh as m
+import mesh_structure.Mesh as Mesh
 import numpy as np
 import algorithms.DivisionsTree as dt
 import algorithms.OptimalEliminationTries as oet
 import tree_view.meshDrawer as md
 
-fileName = "mesh_tests/edge"
+fileName = "mesh_tests/vertex_edge"
 
 
 def create_mesh(fileName=fileName):
@@ -35,7 +33,7 @@ def add_points(mesh_table):
 
 
 def create_mesh_structure(mesh_table):
-    mesh = m.Mesh()
+    mesh = Mesh.Mesh()
     for row in mesh_table:
         v1 = mesh.create_vertex(row[2], row[3])
         v2 = mesh.create_vertex(row[4], row[5])
@@ -55,11 +53,11 @@ mesh = create_mesh(fileName)
 root_contour_node = find_all_divisions_tree(mesh)
 root_elimination_tree = create_optimal_elimination_tries(root_contour_node)
 
-print("")
-print("wszystkie kontury: ", dt.all_contour_counter)
-print("unikalne hashcody: ", len(dt.all_countours))
-print("wszystkie podziały ", dt.division_counter)
-print("optymalne drzewa ", oet.optimal_tree_counter)
+print("vertex poziom 3")
+print("wszystkie kontury: ", mesh.get_all_contour_nodes_count())
+print("unikalne hashcody: ", len(mesh.all_countour_nodes))
+print("wszystkie drzewa eliminacji ", root_contour_node.all_divisions_tree_counter)
+print("optymalne drzewa ", root_elimination_tree.optimal_tree_counter)
 
 #md.clear_tmp()
 #tree_string = md.create_tree_string(mesh, root_elimination_tree)

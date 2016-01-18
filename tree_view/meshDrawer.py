@@ -18,8 +18,8 @@ def draw_tree_node(root_node):
 
 
 def draw_mesh(mesh, colour, file_name):
-    for key in mesh.edge_list.edges:
-        edge = mesh.edge_list.edges[key]
+    for key in mesh.sorted_edge_list.edges:
+        edge = mesh.sorted_edge_list.edges[key]
         plt.plot([edge.v1.x, edge.v2.x], [edge.v1.y, edge.v2.y], colour)
     plt.savefig(file_name)
 

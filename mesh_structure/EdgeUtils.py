@@ -10,8 +10,8 @@ class Edge:
             self.v1 = v2
             self.v2 = v1
         self.length = self.__set_length()
-        
-    def get_second_edge_vertex(self, first_vertex):
+
+    def get_second_vertex_from_edge(self, first_vertex):
         if self.v1 == first_vertex:
             return self.v2
         else:
@@ -40,18 +40,6 @@ class SortedEdgeList:
     def __init__(self):
         self.edges = bt.FastRBTree()
 
-    def add_edge(self, e):
-        key = (e.v1.x, e.v1.y, e.v2.x, e.v2.y)
-        self.edges.insert(key, e)
-        if key in self.edges:
-            return self.edges[key]
-        else:
-            self.edges.insert(key, e)
-        return e
-
-    def get_edge(self, key):
-        return self.edges[key]
-
 
 class EdgeBunch:
 
@@ -79,11 +67,3 @@ class EdgeBunch:
             return True
         else:
             return False
-
-    def change_vertex(self, vertex):
-        for key in self.edge_incident:
-            edge = self.edge_incident[key]
-            if edge.v1 == vertex:
-                edge.v1 = vertex
-            elif edge.v2 == vertex:
-                edge.v2 = vertex

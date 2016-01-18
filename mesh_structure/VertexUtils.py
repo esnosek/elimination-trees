@@ -17,12 +17,6 @@ class SortedVertexLists:
             s = s + str(vertex) + "\n"
         return s
 
-    def get_values(self, column):
-        list = np.array([], dtype=int)
-        for k in self.x_sorted.keys():
-            list = np.append(list, k[column])
-        return list
-
     def get_vertex(self, key):
         return self.x_sorted[key]
 
@@ -83,42 +77,30 @@ class Vertex:
 
         if self.x == v.x:
             if self.y < v.y:
-                self.add_top_edge(edge)
+                self.__add_top_edge(edge)
             else:
-                self.add_bottom_edge(edge)
+                self.__add_bottom_edge(edge)
         else:
             if self.x < v.x:
-                self.add_right_edge(edge)
+                self.__add_right_edge(edge)
             else:
-                self.add_left_edge(edge)
+                self.__add_left_edge(edge)
 
-    def add_top_edge(self, edge):
+    def __add_top_edge(self, edge):
         key = (Direction.top, edge.length)
         self.top_edges.add_incident_edge(key, edge)
 
-    def add_right_edge(self, edge):
+    def __add_right_edge(self, edge):
         key = (Direction.right, edge.length)
         self.right_edges.add_incident_edge(key, edge)
 
-    def add_bottom_edge(self, edge):
+    def __add_bottom_edge(self, edge):
         key = (Direction.bottom, edge.length)
         self.bottom_edges.add_incident_edge(key, edge)
 
-    def add_left_edge(self, edge):
+    def __add_left_edge(self, edge):
         key = (Direction.left, edge.length)
         self.left_edges.add_incident_edge(key, edge)
-
-    def remove_top_edges(self):
-        del self.top_edges
-
-    def remove_right_edges(self):
-        del self.right_edges
-
-    def remove_bottom_edges(self):
-        del self.bottom_edges
-
-    def remove_left_edges(self):
-        del self.left_edges
 
     def __str__(self):
         s = ("[" + str(self.x) + ", " + str(self.y) + "]")
