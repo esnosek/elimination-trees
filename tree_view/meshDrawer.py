@@ -98,13 +98,8 @@ def visit_node(v, contour, colour):
     global used_vertices
 
     used_vertices[(v.x, v.y)] = True
-    if v in contour.contour:
-        index_curr_v = np.where(contour.contour == v)[0][0]
-        prev_v = contour[index_curr_v - 1]
-        next_v = contour[index_curr_v + 1]
-        inside_directions = contour.get_inside_directions(prev_v, v, next_v)
-        existing_directions = v.get_existing_edge_directions()
-        possible_directions = list(set(inside_directions).intersection(existing_directions))
+    if v in contour:
+        possible_directions = contour.get_possible_inside_directions(v)
     else:
         possible_directions = v.get_existing_edge_directions()
     for direction in possible_directions:

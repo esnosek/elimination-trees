@@ -39,7 +39,18 @@ class SortedEdgeList:
 
     def __init__(self):
         self.edges = bt.FastRBTree()
+    
+    def add_edge(self, e):
+        key = (e.v1.x, e.v1.y, e.v2.x, e.v2.y)
+        self.edges.insert(key, e)
 
+    def __getitem__(self, e):
+        key = (e.v1.x, e.v1.y, e.v2.x, e.v2.y)
+        return self.edges[key]
+        
+    def __contains__(self, e):
+        key = (e.v1.x, e.v1.y, e.v2.x, e.v2.y)
+        return key in self.edges
 
 class EdgeBunch:
 
@@ -47,7 +58,8 @@ class EdgeBunch:
         self.edge_incident = bt.FastRBTree()
         self.direction = direction
 
-    def add_incident_edge(self, key, e):
+    def add_incident_edge(self, e):
+        key = (self.direction, e.length)
         self.edge_incident.insert(key, e)
 
     def get_longest_edge(self):

@@ -26,13 +26,12 @@ class Mesh:
 
     def create_edge(self, v1, v2):
         e = EdgeUtils.Edge(v1, v2)
-        key = (v1.x, v1.y, v2.x, v2.y)
-        if key in self.sorted_edge_list.edges:
-            return self.sorted_edge_list.edges[key]
+        if e in self.sorted_edge_list:
+            return self.sorted_edge_list[e]
         else:
             v1.add_incident_edge(e)
             v2.add_incident_edge(e)
-            self.sorted_edge_list.edges.insert(key, e)
+            self.sorted_edge_list.add_edge(e)
         return e
 
     def create_mesh_contour(self):
@@ -73,17 +72,17 @@ class Mesh:
         return False
 
     def __get_lower_left_vertex(self):
-        return self.sorted_vertex_lists.get_vertex((0, 0))
+        return self.sorted_vertex_lists.get_vertex(0, 0)
 
     def __get_upper_left_vertex(self):
-        return self.sorted_vertex_lists.get_vertex((0, self.sorted_vertex_lists.get_max_y()))
+        return self.sorted_vertex_lists.get_vertex(0, self.sorted_vertex_lists.get_max_y())
 
     def __get_upper_right_vertex(self):
-        return self.sorted_vertex_lists.get_vertex((self.sorted_vertex_lists.get_max_x(),
-                                                    self.sorted_vertex_lists.get_max_y()))
+        return self.sorted_vertex_lists.get_vertex(self.sorted_vertex_lists.get_max_x(),
+                                                    self.sorted_vertex_lists.get_max_y())
 
     def __get_lower_right_vertex(self):
-        return self.sorted_vertex_lists.get_vertex((self.sorted_vertex_lists.get_max_x(), 0))
+        return self.sorted_vertex_lists.get_vertex(self.sorted_vertex_lists.get_max_x(), 0)
 
     def __get_top_border(self):
         border_vertices = np.empty(dtype=object, shape=0)

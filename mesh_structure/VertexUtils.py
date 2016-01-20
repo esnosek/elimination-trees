@@ -1,7 +1,6 @@
 from mesh_structure.EdgeUtils import EdgeBunch
 from mesh_structure.Direction import Direction
 import bintrees as bt
-import numpy as np
 
 
 class SortedVertexLists:
@@ -16,8 +15,15 @@ class SortedVertexLists:
             vertex = self.x_sorted[key]
             s = s + str(vertex) + "\n"
         return s
+        
+    def get_vertices_beetween_from_x_sorted(self, v1, v2):
+        return self.x_sorted[(v1.x, v1.y):(v2.x, v2.y)]        
 
-    def get_vertex(self, key):
+    def get_vertices_beetween_from_y_sorted(self, v1, v2):
+        return self.y_sorted[(v1.y, v1.x):(v2.y, v2.x)] 
+        
+    def get_vertex(self, x, y):
+        key = (x, y)
         return self.x_sorted[key]
 
     def get_max_x(self):
@@ -69,38 +75,34 @@ class Vertex:
         elif direction == Direction.left:
             return self.left_edges.get_longest_edge()
 
-    def add_incident_edge(self, edge):
-        if edge.v1 == self:
-            v = edge.v2
+    def add_incident_edge(self, e):
+        if e.v1 == self:
+            v = e.v2
         else:
-            v = edge.v1
+            v = e.v1
 
         if self.x == v.x:
             if self.y < v.y:
-                self.__add_top_edge(edge)
+                self.__add_top_edge(e)
             else:
-                self.__add_bottom_edge(edge)
+                self.__add_bottom_edge(e)
         else:
             if self.x < v.x:
-                self.__add_right_edge(edge)
+                self.__add_right_edge(e)
             else:
-                self.__add_left_edge(edge)
+                self.__add_left_edge(e)
 
-    def __add_top_edge(self, edge):
-        key = (Direction.top, edge.length)
-        self.top_edges.add_incident_edge(key, edge)
+    def __add_top_edge(self, e):
+        self.top_edges.add_incident_edge(e)
 
-    def __add_right_edge(self, edge):
-        key = (Direction.right, edge.length)
-        self.right_edges.add_incident_edge(key, edge)
+    def __add_right_edge(self, e):
+        self.right_edges.add_incident_edge(e)
 
-    def __add_bottom_edge(self, edge):
-        key = (Direction.bottom, edge.length)
-        self.bottom_edges.add_incident_edge(key, edge)
+    def __add_bottom_edge(self, e):
+        self.bottom_edges.add_incident_edge(e)
 
-    def __add_left_edge(self, edge):
-        key = (Direction.left, edge.length)
-        self.left_edges.add_incident_edge(key, edge)
+    def __add_left_edge(self, e):
+        self.left_edges.add_incident_edge(e)
 
     def __str__(self):
         s = ("[" + str(self.x) + ", " + str(self.y) + "]")

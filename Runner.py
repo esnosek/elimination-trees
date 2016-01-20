@@ -1,8 +1,8 @@
 import time
 import mesh_structure.Mesh as Mesh
 import numpy as np
-import algorithms.DivisionsTree as dt
-import algorithms.OptimalEliminationTries as oet
+import algorithms.DivisionsTree as DivisionsTree
+import algorithms.OptimalEliminationTries as OptimalEliminationTries
 import tree_view.meshDrawer as md
 
 fileName = "mesh_tests/vertex_edge"
@@ -15,11 +15,14 @@ def create_mesh(fileName=fileName):
 
 
 def find_all_divisions_tree(mesh):
-    return dt.create_all_divisions_tree(mesh)
+    dt = DivisionsTree.DivisionsTree(mesh)
+    return dt.create_all_divisions_tree()
 
 
 def create_optimal_elimination_tries(root_contour_node):
-    return oet.create_optimal_elimination_tries(root_contour_node)
+    oet = OptimalEliminationTries.OptimalEliminationTries(root_contour_node)
+    oet.create_optimal_elimination_tries()
+    return oet.optimal_tree_contour_node
 
 
 def load_file(path):
@@ -51,13 +54,13 @@ start_time = int(round(time.time() * 100000))
 
 mesh = create_mesh(fileName)
 root_contour_node = find_all_divisions_tree(mesh)
-root_elimination_tree = create_optimal_elimination_tries(root_contour_node)
+optimal_tree_contour_node = create_optimal_elimination_tries(root_contour_node)
 
 print("vertex poziom 3")
 print("wszystkie kontury: ", mesh.get_all_contour_nodes_count())
 print("unikalne hashcody: ", len(mesh.all_countour_nodes))
 print("wszystkie drzewa eliminacji ", root_contour_node.all_divisions_tree_counter)
-print("optymalne drzewa ", root_elimination_tree.optimal_tree_counter)
+print("optymalne drzewa ", optimal_tree_contour_node.optimal_tree_counter)
 
 #md.clear_tmp()
 #tree_string = md.create_tree_string(mesh, root_elimination_tree)

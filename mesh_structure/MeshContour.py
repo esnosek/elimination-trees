@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
-from mesh_structure.Direction import Direction
+from mesh_structure.Direction import Direction, VectorDirection
 
 class MeshContour:
 
@@ -110,125 +110,10 @@ class MeshContour:
         possible_directions = list(set(inside_directions).intersection(existing_directions))
         return possible_directions
             
-    def slice_contour(self, path):
-        new_path = self.__add_missing_vertices(path)
-        contour1, contour2 = self.__create_new_contours(new_path)
-        return contour1, contour2
-
-    def __add_missing_vertices(self, path):
-        new_path = np.empty(dtype=object, shape=0)
-        last_index = len(path) - 1
-        curr_index = 1
-        prev_v = path[curr_index - 1]
-        curr_v = path[curr_index]
-        new_path = np.append(new_path, prev_v)
-        while True:
-            prev_v = path[curr_index - 1]
-            curr_v = path[curr_index]
-            new_path = self.__add_vertices_beetween_two_vertex(new_path, prev_v, curr_v)
-            new_path = np.append(new_path, curr_v)
-            if curr_index == last_index:
-                break
-            else:
-                curr_index = curr_index + 1
-        return new_path 
-
-    def __create_new_contours(self, path):
-        start_v = path[0]
-        end_v = path[len(path) - 1]
-        index_start_v = np.where(self.contour == start_v)[0][0]
-        index_end_v = np.where(self.contour == end_v)[0][0]
-        countour_part_1 = self.contour[index_start_v + 1:index_end_v]
-        new_contour_1 = np.append(countour_part_1, path[::-1])
-        countour_part_2 = self.contour[:(index_start_v)]
-        countour_part_3 = self.contour[(index_end_v + 1):]
-        countour_part_2 = np.append(countour_part_2, path)
-        new_contour_2 = np.append(countour_part_2, countour_part_3)  
-        return MeshContour(new_contour_1, self.mesh), MeshContour(new_contour_2, self.mesh) 
-                
-    def __add_vertices_beetween_two_vertex(self, list, v1, v2):
-        vector_direction = self.__get_vector_direction(v1, v2)
-        if vector_direction == Direction.top:
-            list = self.__add_vertices_from_top_directed_vector(list, v1, v2)
-        if vector_direction == Direction.right:
-            list = self.__add_vertices_from_right_directed_vector(list, v1, v2)
-        if vector_direction == Direction.bottom:
-            list = self.__add_vertices_from_bottom_directed_vector(list, v1, v2)
-        if vector_direction == Direction.left:
-            list = self.__add_vertices_from_left_directed_vector(list, v1, v2)
-        return list
-
-    def __get_vector_direction(self, v1, v2):
-        if self.__is_direction_top(v1, v2):
-            return Direction.top
-        if self.__is_direction_right(v1, v2):
-            return Direction.right
-        if self.__is_direction_bottom(v1, v2):
-            return Direction.bottom
-        if self.__is_direction_left(v1, v2):
-            return Direction.left
-
-    def __is_direction_top(self, v1, v2):
-        if v1.x == v2.x and v1.y < v2.y:
-            return True
-        return False
-
-    def __is_direction_right(self, v1, v2):
-        if v1.x < v2.x and v1.y == v2.y:
-            return True
-        return False
-
-    def __is_direction_bottom(self, v1, v2):
-        if v1.x == v2.x and v1.y > v2.y:
-            return True
-        return False
-
-    def __is_direction_left(self, v1, v2):
-        if v1.x > v2.x and v1.y == v2.y:
-            return True
-        return False
-
-    def __add_vertices_from_top_directed_vector(self, list, v1, v2):
-        # krawedz skierowana w gore, wiec v1 < v2
-        vertices_beetween = self.mesh.sorted_vertex_lists.x_sorted[(v1.x, v1.y):(v2.x, v2.y)]
-        for key in vertices_beetween:
-            vertex = vertices_beetween[key]
-            if vertex != v1 and vertex != v2:
-                list = np.append(list,  vertex)
-        return list
-
-    def __add_vertices_from_right_directed_vector(self, list, v1, v2):
-        # krawedz skierowana w prawo, wiec v1 < v2
-        vertices_beetween = self.mesh.sorted_vertex_lists.y_sorted[(v1.y, v1.x):(v2.y, v2.x)]
-        for key in vertices_beetween:
-            vertex = vertices_beetween[key]
-            if vertex != v1 and vertex != v2:
-                list = np.append(list,  vertex)
-        return list
-
-    def __add_vertices_from_bottom_directed_vector(self, list, v1, v2):
-        # krawedz skierowana w dół, wiec v1 > v2
-        vertices_beetween = self.mesh.sorted_vertex_lists.x_sorted[(v2.x, v2.y):(v1.x, v1.y)]
-        size_of_slice_vertices = list.size
-        for key in vertices_beetween:
-            vertex = vertices_beetween[key]
-            if vertex != v1 and vertex != v2:
-                list = np.insert(list, size_of_slice_vertices, vertex)
-        return list
-
-    def __add_vertices_from_left_directed_vector(self, list, v1, v2):
-        # krawedz skierowana w lewo, wiec v1 > v2
-        vertices_beetween = self.mesh.sorted_vertex_lists.y_sorted[(v2.y, v2.x):(v1.y, v1.x)]
-        size_of_slice_vertices = list.size
-        for key in vertices_beetween:
-            vertex = vertices_beetween[key]
-            if vertex != v1 and vertex != v2:
-                list = np.insert(list, size_of_slice_vertices, vertex)
-        return list
 
     def __get_inside_directions(self, prev_v, curr_v, next_v):
-        dir1 = self.__get_vector_direction(prev_v, curr_v)
-        dir2 = self.__get_vector_direction(curr_v, next_v)
+        dir1 = VectorDirection().get_vector_direction(prev_v, curr_v)
+        dir2 = VectorDirection().get_vector_direction(curr_v, next_v)
         if dir1 == Direction.top and dir2 == Direction.top:
             return self.__get_inside_directions_from_vertex_beetwen_top_and_top_vectors()
         if dir1 == Direction.top and dir2 == Direction.right:
