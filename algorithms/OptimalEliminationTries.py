@@ -6,7 +6,7 @@ class OptimalEliminationTries:
     def __init__(self, root_contour_node):
         self.root_contour_node = root_contour_node
         self.optimal_tree_contour_node = None
-
+        
     def create_optimal_elimination_tries(self):
         self.optimal_tree_contour_node = self.__create_low_level_tries(self.root_contour_node)
         

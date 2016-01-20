@@ -101,6 +101,12 @@ class MeshContour:
             return True
         return False
 
+    def get_index_of(self, v):
+        return np.where(self.contour == v)[0][0]        
+  
+    def get_vertices_beetween(self, index_1, index_2):
+        return self.contour[index_1:index_2]
+        
     def get_possible_inside_directions(self, v):
         index_v = np.where(self.contour == v)[0][0]
         prev_v = self[index_v - 1]

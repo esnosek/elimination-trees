@@ -5,7 +5,7 @@ import algorithms.DivisionsTree as DivisionsTree
 import algorithms.OptimalEliminationTries as OptimalEliminationTries
 import tree_view.meshDrawer as md
 
-fileName = "mesh_tests/vertex_edge"
+fileName = "mesh_tests/vertex"
 
 
 def create_mesh(fileName=fileName):
@@ -62,10 +62,10 @@ print("unikalne hashcody: ", len(mesh.all_countour_nodes))
 print("wszystkie drzewa eliminacji ", root_contour_node.all_divisions_tree_counter)
 print("optymalne drzewa ", optimal_tree_contour_node.optimal_tree_counter)
 
-#md.clear_tmp()
-#tree_string = md.create_tree_string(mesh, root_elimination_tree)
-#tree_string += ';'
-#md.draw_tree(tree_string)
+md.clear_tmp()
+tree_string = md.create_tree_string(mesh, optimal_tree_contour_node)
+tree_string += ';'
+md.draw_tree(tree_string)
 
 end_time = int(round(time.time() * 100000))
 print('czas: ' + str((end_time - start_time)/100000) + 's')

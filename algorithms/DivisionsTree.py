@@ -24,7 +24,7 @@ class DivisionsTree:
     def generate_all_children_division_nodes(self, contour_node):
         lowest_cost = sys.maxsize
         if not contour_node.contour.is_atomic_square():
-            cu = CuttingUtils.PathsFinder(contour_node.contour)
+            cu = CuttingUtils.SlicePathsFinder(contour_node.contour)
             possible_cuts = cu.get_possible_paths()
             for path in possible_cuts:
                 lowest_cost = self.create_new_division_node(path, contour_node, lowest_cost)
@@ -40,7 +40,8 @@ class DivisionsTree:
     
     
     def create_new_division_node(self, path, parent_contour_node, lowest_cost):
-        new_division_node = DivisionNode(self.mesh, path, parent_contour_node)
+        new_division_node = DivisionNode(path, parent_contour_node)
+        self.__slice_parent_contour_node(new_division_node, parent_contour_node, path)
         parent_contour_node.add_children_division(new_division_node)
         cost_of_child_1 = self.create_low_level_tree(new_division_node.contour_node_1, new_division_node)
         cost_of_child_2 = self.create_low_level_tree(new_division_node.contour_node_2, new_division_node)
@@ -53,8 +54,13 @@ class DivisionsTree:
         if total_cost < lowest_cost:
             lowest_cost = total_cost
         return lowest_cost
-    
-    
+
+    def __slice_parent_contour_node(self, division_node, parent_contour_node, path):
+        cs = CuttingUtils.ContourSlice(parent_contour_node.contour, path)
+        new_contour1, new_contour2 = cs.slice_contour()
+        division_node.contour_node_1 = division_node.create_contour_node(self.mesh, new_contour1)
+        division_node.contour_node_2 = division_node.create_contour_node(self.mesh, new_contour2)
+
     def create_low_level_tree(self, parent_contour_node, parent_division_node):
         if self.mesh.is_in_all_contour_nodes(parent_contour_node.contour):
             existing_contour_node = self.mesh.get_from_all_contour_nodes(parent_contour_node.contour)
@@ -114,15 +120,13 @@ class ContourNode:
 
 class DivisionNode:
 
-    def __init__(self, mesh, path, parent_contour_node):
+    def __init__(self, path, parent_contour_node):
         self.path = path
         self.parent_contour_node = parent_contour_node
-        cs = CuttingUtils.ContourSlice(parent_contour_node.contour, path)
-        new_contour1, new_contour2 = cs.slice_contour()
-        self.contour_node_1 = self.create_contour_node(mesh, new_contour1)
-        self.contour_node_2 = self.create_contour_node(mesh, new_contour2)
+        self.contour_node_1 = None
+        self.contour_node_2 = None
         self.cost = None
-        self.all_divisions_tree_counter = 0
+        self.all_divisions_tree_counter = None
 
     def create_contour_node(self, mesh, contour):
         if mesh.is_in_all_contour_nodes(contour):

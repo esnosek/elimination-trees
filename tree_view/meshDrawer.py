@@ -7,36 +7,10 @@ plt.figure(figsize=(6,6))
 node_id = 0
 used_vertices = {}
 
-
-def draw_tree_node(root_node):
-    fig, ax = plt.subplots(200, 1)
-    from algorithms.DivisionsTree import TreeLeaf
-    while root_node is not TreeLeaf:
-        draw_contour_from_optimal_tree(root_node.contour, 'k', ax)
-        draw_tree_node(root_node.child1)
-        draw_tree_node(root_node.child2)
-
-
-def draw_mesh(mesh, colour, file_name):
+def draw_mesh(mesh, colour):
     for key in mesh.sorted_edge_list.edges:
         edge = mesh.sorted_edge_list.edges[key]
-        plt.plot([edge.v1.x, edge.v2.x], [edge.v1.y, edge.v2.y], colour)
-    plt.savefig(file_name)
-
-
-def draw_contour_from_optimal_tree(vertex_list, colour, ax):
-    global counter
-    last_index = len(vertex_list) - 1
-    for vertex in vertex_list:
-        curr_index = np.where(vertex_list == vertex)[0][0]
-        if curr_index == last_index:
-            next_index = 0
-        else:
-            next_index = curr_index + 1
-        v1 = vertex_list[curr_index]
-        v2 = vertex_list[next_index]
-        ax[counter].plot([v1.x, v2.x], [v1.y, v2.y], colour)
-    plt.show()
+        plt.plot([edge.v1.x, edge.v2.x], [edge.v1.y, edge.v2.y], colour, linestyle="dotted")
 
 
 def draw_leaf(mesh, tree_leaf, file_name, cost):
@@ -44,17 +18,8 @@ def draw_leaf(mesh, tree_leaf, file_name, cost):
     #plt.axis([mesh.min_x, mesh.max_x, mesh.min_y, mesh.max_y])
     plt.xlabel(int(cost), fontsize=110)
     plt.gcf().subplots_adjust(bottom=0.30)
-    draw_mesh(mesh, 'k', "do_usuniecia")
+    draw_mesh(mesh, 'k')
     draw_contour(tree_leaf.contour, 'k')
-    plt.savefig(file_name)
-
-
-def draw_contour_with_interior_and_slice_from_division_node(mesh, division_node, file_name):
-    plt.clf()
-    draw_mesh(mesh, 'k', "do_usuniecia")
-    draw_contour(division_node.parent_contour_node.contour, 'k')
-    draw_contour_interior(division_node.parent_contour_node.contour, 'k')
-    draw_slice(division_node.path, 'r')
     plt.savefig(file_name)
 
 
@@ -133,7 +98,7 @@ def draw_contour_with_interior_and_slice(mesh, tree_node_child, file_name, cost)
     plt.clf()
     plt.xlabel(int(cost), fontsize=110)
     plt.gcf().subplots_adjust(bottom=0.30)
-    draw_mesh(mesh, 'k', "do_usuniecia")
+    draw_mesh(mesh, 'k')
     draw_contour(tree_node_child.contour, 'k')
     draw_contour_interior(tree_node_child.contour, 'k')
     draw_slice(tree_node_child.path, 'r')
