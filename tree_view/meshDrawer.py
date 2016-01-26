@@ -8,9 +8,8 @@ node_id = 0
 used_vertices = {}
 
 def draw_mesh(mesh, colour):
-    for key in mesh.sorted_edge_list.edges:
-        edge = mesh.sorted_edge_list.edges[key]
-        plt.plot([edge.v1.x, edge.v2.x], [edge.v1.y, edge.v2.y], colour, linestyle="dotted")
+    for e in mesh.sorted_edge_list:
+        plt.plot([e.v1.x, e.v2.x], [e.v1.y, e.v2.y], colour, linestyle="dotted")
 
 
 def draw_leaf(mesh, tree_leaf, file_name, cost):
@@ -23,15 +22,15 @@ def draw_leaf(mesh, tree_leaf, file_name, cost):
     plt.savefig(file_name)
 
 
-def draw_slice(slice_vertices, colour):
-    last_index = len(slice_vertices) - 1
+def draw_slice(path, colour):
+    last_index = len(path) - 1
     curr_index = 0
-    for vertex in slice_vertices:
+    for vertex in path:
         if curr_index == last_index:
             break
         next_index = curr_index + 1
-        v1 = slice_vertices[curr_index]
-        v2 = slice_vertices[next_index]
+        v1 = path[curr_index]
+        v2 = path[next_index]
         plt.plot([v1.x, v2.x], [v1.y, v2.y], colour, linewidth=4.0)
         curr_index = curr_index + 1
 

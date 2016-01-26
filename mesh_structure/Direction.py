@@ -19,6 +19,9 @@ class Direction(Enum):
 
 class VectorDirection:
     
+    def __init__(self):
+        pass
+        
     def get_vector_direction(self, v1, v2):
         if self.__is_direction_top(v1, v2):
             return Direction.top

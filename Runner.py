@@ -16,7 +16,8 @@ def create_mesh(fileName=fileName):
 
 def find_all_divisions_tree(mesh):
     dt = DivisionsTree.DivisionsTree(mesh)
-    return dt.create_all_divisions_tree()
+    dt.create_all_divisions_tree()
+    return dt
 
 
 def create_optimal_elimination_tries(root_contour_node):
@@ -53,12 +54,12 @@ def create_mesh_structure(mesh_table):
 start_time = int(round(time.time() * 100000))
 
 mesh = create_mesh(fileName)
-root_contour_node = find_all_divisions_tree(mesh)
+root_contour_node = find_all_divisions_tree(mesh).root_contour_node
 optimal_tree_contour_node = create_optimal_elimination_tries(root_contour_node)
 
 print("vertex poziom 3")
 print("wszystkie kontury: ", mesh.get_all_contour_nodes_count())
-print("unikalne hashcody: ", len(mesh.all_countour_nodes))
+print("unikalne hashcody: ", mesh.get_unique_hash_key_count())
 print("wszystkie drzewa eliminacji ", root_contour_node.all_divisions_tree_counter)
 print("optymalne drzewa ", optimal_tree_contour_node.optimal_tree_counter)
 

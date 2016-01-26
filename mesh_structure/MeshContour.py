@@ -5,22 +5,20 @@ from mesh_structure.Direction import Direction, VectorDirection
 
 class MeshContour:
 
-    def __init__(self, contour, mesh):
-        self.mesh = mesh
+    def __init__(self, contour):
         self.contour = contour
+        self.contour_index = None
+        self.hash_key = None
         self.__remove_useless_vertex()
-        self.contour_index = self.__create_contour_index()
-        self.max_x = self.__get_max_x()
-        self.min_x = self.__get_min_x()
-        self.max_y = self.__get_max_y()
-        self.min_y = self.__get_min_y()        
-        self.hash_key = self.__set_hash_key()
+        self.__create_contour_index()  
+        self.__set_hash_key()
         
     def __getitem__(self, index):
         return self.contour[index % len(self.contour)]
 
     def __contains__(self, v):
-        return (v.x, v.y) in self.contour_index
+        key = (v.x, v.y)
+        return key in self.contour_index
         
     def __len__(self):
         return len(self.contour)
@@ -37,7 +35,7 @@ class MeshContour:
     def __remove_useless_vertex(self):
         vertex_to_remove = []
         for v in self.contour:
-            index_v = np.where(self.contour == v)[0][0]
+            index_v = self.get_index_of(v)
             prev_v = self[index_v - 1]
             next_v = self[index_v + 1]
             inside_directions =  self.__get_inside_directions(prev_v,v,next_v)
@@ -48,14 +46,14 @@ class MeshContour:
             if len(possible_directions) == 0:
                 vertex_to_remove.append(v)
         for v in vertex_to_remove:
-            index_v = np.where(self.contour == v)[0][0]
+            index_v = self.get_index_of(v)
             self.contour = np.delete(self.contour, index_v)
 
     def __create_contour_index(self):
         contour_index = {}
         for v in self.contour:
             contour_index[(v.x, v.y)] = v
-        return contour_index
+        self.contour_index = contour_index
         
     def __set_hash_key(self):
         min_el = min(self.contour)
@@ -65,37 +63,8 @@ class MeshContour:
         for el in self.contour:
             c_x_sum += el.x
             c_y_sum += el.y
-        hash_key = hash(((min_el.x, min_el.y), (c_x_sum, c_y_sum), (max_el.x, max_el.y)))  
-        return hash_key
+        self.hash_key = hash(((min_el.x, min_el.y), (c_x_sum, c_y_sum), (max_el.x, max_el.y)))  
 
-    def __get_max_x(self):
-        max_x = self.contour[0].x
-        for v in self.contour:
-            if v.x > max_x:
-                max_x = v.x
-        return max_x
-
-    def __get_min_x(self):
-        min_x = self.contour[0].x
-        for v in self.contour:
-            if v.x < min_x:
-                min_x = v.x
-        return min_x
-
-    def __get_max_y(self):
-        max_y = self.contour[0].y
-        for v in self.contour:
-            if v.y > max_y:
-                max_y = v.y
-        return max_y
-
-    def __get_min_y(self):
-        min_y = self.contour[0].y
-        for v in self.contour:
-            if v.y < min_y:
-                min_y = v.y
-        return min_y
-        
     def is_atomic_square(self):
         if len(self.contour) == 4:
             return True

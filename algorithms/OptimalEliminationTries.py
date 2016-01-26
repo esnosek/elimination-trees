@@ -9,7 +9,8 @@ class OptimalEliminationTries:
         
     def create_optimal_elimination_tries(self):
         self.optimal_tree_contour_node = self.__create_low_level_tries(self.root_contour_node)
-        
+        return self.optimal_tree_contour_node
+       
     def __create_low_level_tries(self, contour_node):
         if contour_node.contour.is_atomic_square():
             return OptimalTreeLeaf(contour_node.contour, contour_node.lowest_cost)
@@ -19,7 +20,8 @@ class OptimalEliminationTries:
         for division in lowest_cost_divisions:
             child_1 = self.__create_low_level_tries(division.contour_node_1)
             child_2 = self.__create_low_level_tries(division.contour_node_2)
-            optimal_tree_contour_node.add_child(child_1, child_2, contour_node.contour, division.path)
+            child = OptimalTreeDivisionNode(child_1, child_2, contour_node.contour, division.path)
+            optimal_tree_contour_node.add_child(child)
             children1 = child_1.optimal_tree_counter
             children2 = child_2.optimal_tree_counter
             counter += children1 * children2
@@ -34,8 +36,8 @@ class OptimalTreeContourNode:
         self.cost = cost
         self.optimal_tree_counter = 0
 
-    def add_child(self, child1, child2, contour, path):
-        self.children = np.append(self.children, OptimalTreeDivisionNode(child1, child2, contour, path))
+    def add_child(self, child):
+        self.children = np.append(self.children, child)
 
 
 class OptimalTreeDivisionNode:

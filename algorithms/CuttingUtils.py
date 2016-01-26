@@ -8,7 +8,8 @@ import numpy as np
 class SlicePathsFinder:
 
 
-    def __init__(self, contour):
+    def __init__(self, mesh, contour):
+        self.mesh = mesh
         self.possible_paths = []
         self.end_vertices_list = []
         self.contour = contour
@@ -90,7 +91,8 @@ class SlicePathsFinder:
 class ContourSlice:
 
 
-    def __init__(self, contour, path):
+    def __init__(self, mesh, contour, path):
+        self.mesh = mesh
         self.contour = contour
         self.path = self.__add_missing_vertices(path)
 
@@ -127,7 +129,7 @@ class ContourSlice:
         countour_part_3 = self.contour.get_vertices_beetween(index_end_v + 1, len(self.contour))
         countour_part_2 = np.append(countour_part_2, self.path)
         new_contour_2 = np.append(countour_part_2, countour_part_3)  
-        return MeshContour(new_contour_1, self.contour.mesh), MeshContour(new_contour_2, self.contour.mesh) 
+        return MeshContour(new_contour_1), MeshContour(new_contour_2) 
                 
     def __add_vertices_beetween_two_vertex(self, list, v1, v2):
         vector_direction = VectorDirection().get_vector_direction(v1, v2)
@@ -144,7 +146,7 @@ class ContourSlice:
 
     def __add_vertices_from_top_directed_vector(self, list, v1, v2):
         # krawedz skierowana w gore, wiec v1 < v
-        vertices_beetween = self.contour.mesh.sorted_vertex_lists.get_vertices_beetween_from_x_sorted(v1, v2)
+        vertices_beetween = self.mesh.sorted_vertex_lists.get_vertices_beetween_from_x_sorted(v1, v2)
         for key in vertices_beetween:
             vertex = vertices_beetween[key]
             if vertex != v1 and vertex != v2:
@@ -153,7 +155,7 @@ class ContourSlice:
 
     def __add_vertices_from_right_directed_vector(self, list, v1, v2):
         # krawedz skierowana w prawo, wiec v1 < v2
-        vertices_beetween = self.contour.mesh.sorted_vertex_lists.get_vertices_beetween_from_y_sorted(v1, v2)
+        vertices_beetween = self.mesh.sorted_vertex_lists.get_vertices_beetween_from_y_sorted(v1, v2)
         for key in vertices_beetween:
             vertex = vertices_beetween[key]
             if vertex != v1 and vertex != v2:
@@ -162,7 +164,7 @@ class ContourSlice:
 
     def __add_vertices_from_bottom_directed_vector(self, list, v1, v2):
         # krawedz skierowana w dół, wiec v1 > v2
-        vertices_beetween = self.contour.mesh.sorted_vertex_lists.get_vertices_beetween_from_x_sorted(v2, v1)
+        vertices_beetween = self.mesh.sorted_vertex_lists.get_vertices_beetween_from_x_sorted(v2, v1)
         size_of_slice_vertices = list.size
         for key in vertices_beetween:
             vertex = vertices_beetween[key]
@@ -172,7 +174,7 @@ class ContourSlice:
 
     def __add_vertices_from_left_directed_vector(self, list, v1, v2):
         # krawedz skierowana w lewo, wiec v1 > v2
-        vertices_beetween = self.contour.mesh.sorted_vertex_lists.get_vertices_beetween_from_y_sorted(v2, v1)
+        vertices_beetween = self.mesh.sorted_vertex_lists.get_vertices_beetween_from_y_sorted(v2, v1)
         size_of_slice_vertices = list.size
         for key in vertices_beetween:
             vertex = vertices_beetween[key]

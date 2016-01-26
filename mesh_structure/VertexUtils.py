@@ -9,6 +9,14 @@ class SortedVertexLists:
         self.x_sorted = bt.FastRBTree()
         self.y_sorted = bt.FastRBTree()
 
+    def __contains__(self, v):
+        key = (v.x, v.y)
+        return key in self.x_sorted
+        
+    def __getitem__(self, v):
+        key = (v.x, v.y)
+        return self.x_sorted[key]
+        
     def __str__(self):
         s = ""
         for key in self.x_sorted:
@@ -21,6 +29,14 @@ class SortedVertexLists:
 
     def get_vertices_beetween_from_y_sorted(self, v1, v2):
         return self.y_sorted[(v1.y, v1.x):(v2.y, v2.x)] 
+        
+    def add_to_x_sorted(self, v):
+        key = (v.x, v.y)
+        self.x_sorted.insert(key, v)
+        
+    def add_to_y_sorted(self, v):
+        key = (v.y, v.x)
+        self.y_sorted.insert(key, v)        
         
     def get_vertex(self, x, y):
         key = (x, y)
