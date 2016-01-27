@@ -3,7 +3,6 @@ import numpy as np
 from ete3 import Tree, faces, TreeStyle
 
 
-plt.figure(figsize=(6,6))
 node_id = 0
 used_vertices = {}
 
@@ -132,6 +131,7 @@ def draw_tree(tree_string):
     ts.rotation = 90
     ts.layout_fn = mylayout
     t.show(tree_style = ts)
+    plt.clf()
     
 
 
